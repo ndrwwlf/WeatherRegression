@@ -1,19 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using WeatherService.Db;
+using WeatherService.Services;
 
 namespace WeatherService.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+        private WeatherDataService _dataService;
+
+        public ValuesController(WeatherDataService dataService)
+        {
+            _dataService = dataService;
+        }
+        
+       
         // GET api/values
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] { "value1", "value2" };
+            List<Location> locations = _dataService.ReadAll();
+            return locations.Select(i => i.ZipCode.ToString().Trim()).ToArray();
         }
 
         // GET api/values/5
