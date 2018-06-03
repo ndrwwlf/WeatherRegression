@@ -20,10 +20,10 @@ namespace WeatherService.Controllers
        
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<Location> Get()
         {
-            List<Location> locations = _dataService.ReadAll();
-            return locations.Select(i => i.ZipCode.ToString().Trim()).ToArray();
+            return _dataService.ReadAll();
+            //return locations.Select(i => i.ZipCode.ToString().Trim()).ToArray();
         }
 
         // GET api/values/5
