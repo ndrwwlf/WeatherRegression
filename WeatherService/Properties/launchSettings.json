@@ -19,7 +19,7 @@
     "WeatherService": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchUrl": "api/locations",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
