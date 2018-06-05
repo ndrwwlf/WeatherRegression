@@ -1,0 +1,10 @@
+﻿-- user: foo, pwd: bar
+
+CREATE TABLE Location (
+  ID	INT	NOT NULL	IDENTITY	PRIMARY KEY,
+  ZipCode	VARCHAR(10)	NOT NULL
+);
+
+insert into Location values('59801');
+insert into Location values('59804');
+insert into Location values('59803-123');
