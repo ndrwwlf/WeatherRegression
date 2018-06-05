@@ -34,7 +34,7 @@ namespace WeatherService
             });
 
             string connectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
-            services.AddSingleton<IWeatherDataService>(c => new WeatherDataService(connectionString));
+            services.AddSingleton<IWeatherRepository>(c => new WeatherRepository(connectionString));
 
         }
 

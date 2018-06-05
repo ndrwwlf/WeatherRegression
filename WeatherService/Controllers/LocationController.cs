@@ -10,18 +10,18 @@ namespace WeatherService.Controllers
     [Route("api/locations")]
     public class LocationController : Controller
     {
-        private readonly IWeatherDataService _weatherDataService;
+        private readonly IWeatherRepository _weatherRepository;
 
-        public LocationController(IWeatherDataService weatherDataService)
+        public LocationController(IWeatherRepository weatherRepository)
         {
-            _weatherDataService = weatherDataService;
+            _weatherRepository = weatherRepository;
         }
         
         // GET api/locations
         [HttpGet]
         public IEnumerable<Location> Get()
         {
-            return _weatherDataService.GetLocations();
+            return _weatherRepository.GetLocations();
         }
 
         // GET api/locations/5
@@ -30,7 +30,7 @@ namespace WeatherService.Controllers
         [ProducesResponseType(404)]
         public IActionResult Get(int id)
         {
-            Location location = _weatherDataService.GetLocation(id);
+            Location location = _weatherRepository.GetLocation(id);
             if (location != null)
             {
                 return Ok(location);
@@ -45,7 +45,7 @@ namespace WeatherService.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]PutPostLocation putPostLocation)
         {
-            Location location =  _weatherDataService.InsertLocation(putPostLocation);
+            Location location = _weatherRepository.InsertLocation(putPostLocation);
             return Created("/" + location.ID, location);
         }
 
