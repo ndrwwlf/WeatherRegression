@@ -8,6 +8,7 @@ namespace WeatherService.Scheduled
 {
     public class SchedulerJob
     {
+
         public static async Task RunAsync()
         {
             try
@@ -18,9 +19,9 @@ namespace WeatherService.Scheduled
                 scheduler.Start().Wait();
 
                 int ScheduleIntervalInMinute = 1;//job will run every minute
-                JobKey jobKey = JobKey.Create("DemoJob1");
+                JobKey jobKey = JobKey.Create("AerisJob");
 
-                IJobDetail job = JobBuilder.Create<MyJob>().WithIdentity(jobKey).Build();
+                IJobDetail job = JobBuilder.Create<AerisJob>().WithIdentity(jobKey).Build();
 
                 ITrigger trigger = TriggerBuilder.Create()
                     .WithIdentity("JobTrigger")

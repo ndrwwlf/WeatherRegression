@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WeatherService.Scheduled
 {
-    public class MyJob : IJob
+    public class AerisJob : IJob
     {
         public Task Execute(IJobExecutionContext context)
         {
