@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using WeatherService.Db;
+using WeatherService.Scheduled;
 using WeatherService.Services;
 
 namespace WeatherService
@@ -20,6 +22,12 @@ namespace WeatherService
                 .AddEnvironmentVariables();
 
             Configuration = builder.Build();
+
+            ILoggerFactory loggerFactory = new LoggerFactory()
+            .AddConsole()
+            .AddDebug();
+
+            SchedulerJob.RunAsync().GetAwaiter().GetResult();
         }
 
         public IConfiguration Configuration { get; set; }
