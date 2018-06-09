@@ -9,13 +9,14 @@ namespace WeatherService.Scheduled
     public class SchedulerJob
     {
 
-        public static async Task RunAsync()
+        public static async Task RunAsync(AerisJobParams aerisJobParams)
         {
             try
             {
                 IScheduler scheduler;
                 var schedulerFactory = new StdSchedulerFactory();
                 scheduler = schedulerFactory.GetScheduler().Result;
+                scheduler.Context.Put("aerisJobParams", aerisJobParams);
                 scheduler.Start().Wait();
 
                 int ScheduleIntervalInMinute = 1;//job will run every minute

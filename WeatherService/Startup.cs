@@ -27,7 +27,10 @@ namespace WeatherService
             .AddConsole()
             .AddDebug();
 
-            SchedulerJob.RunAsync().GetAwaiter().GetResult();
+            AerisJobParams aerisJobParams = new AerisJobParams();
+            aerisJobParams.AerisAccessId = "pvgTjAD4onCI2NmIqcC4T";
+            aerisJobParams.AerisSecretKey = "lNuane8qGpRMYVxBQC1mZyYdj3cKtQVGswqz5cNe";
+            SchedulerJob.RunAsync(aerisJobParams).GetAwaiter().GetResult();
         }
 
         public IConfiguration Configuration { get; set; }
