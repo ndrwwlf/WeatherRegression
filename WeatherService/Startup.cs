@@ -7,6 +7,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using WeatherService.Db;
 using WeatherService.Scheduled;
 using WeatherService.Services;
+using WeatherService.Validation;
 
 namespace WeatherService
 {
@@ -35,7 +36,11 @@ namespace WeatherService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(o =>
+            {
+                o.ModelMetadataDetailsProviders.Add(new RequiredBindingMetadataProvider());
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Weather Service API", Version = "v1" });

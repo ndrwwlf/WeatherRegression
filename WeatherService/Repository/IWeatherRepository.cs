@@ -10,6 +10,8 @@ namespace WeatherService.Services
         Location GetLocation(int id);
         Location InsertLocation(PutPostLocation location);
         bool DeleteLocation(int id);
-        bool UpdateLocation(Location location);
+        Location UpdateLocation(Location location);
+        bool GetZipCodeExist(string ZipCode);
+        bool GetLocationExist(int LocationID);
     }
 }

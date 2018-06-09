@@ -18,16 +18,17 @@ namespace WeatherService.Scheduled
                 scheduler = schedulerFactory.GetScheduler().Result;
                 scheduler.Start().Wait();
 
-                int ScheduleIntervalInMinute = 1;//job will run every minute
+                //int ScheduleIntervalInMinute = 1;//job will run every minute
                 JobKey jobKey = JobKey.Create("AerisJob");
 
                 IJobDetail job = JobBuilder.Create<AerisJob>().WithIdentity(jobKey).Build();
 
                 ITrigger trigger = TriggerBuilder.Create()
                     .WithIdentity("JobTrigger")
+                    .UsingJobData("city", "Hello World!")
                     .StartNow()
                     //.WithSimpleSchedule(x => x.WithIntervalInMinutes(ScheduleIntervalInMinute).RepeatForever())
-                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).RepeatForever())
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(5))
                     .Build();
 
                 await scheduler.ScheduleJob(job, trigger);

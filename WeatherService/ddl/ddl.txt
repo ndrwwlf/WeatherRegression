@@ -1,7 +1,7 @@
 ﻿-- user: foo, pwd: bar
 
 CREATE Table [Location] (
-  Id	INT	NOT NULL	IDENTITY	PRIMARY KEY,
+  Id	INT	NOT NULL	IDENTITY(1,1)	PRIMARY KEY,
   ZipCode	VARCHAR(10)	NOT NULL
 );
 
