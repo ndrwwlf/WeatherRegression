@@ -5,7 +5,7 @@ CREATE Table [Location] (
   ZipCode	VARCHAR(10)	NOT NULL,
   StationId VARCHAR(10)
 );
-
+2
 insert into [Location] values('59801', 'KMSO');
 insert into [Location] values('59804', 'KMSO');
 insert into [Location] values('55407', 'KMSP');

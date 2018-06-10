@@ -1,21 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
 using Quartz;
-using Quartz.Logging;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading;
-using System.Net.Http;
 using System.Threading.Tasks;
-using WeatherService.Scheduled;
+using WeatherService.Db;
 using WeatherService.Model;
 using WeatherService.Services;
-using WeatherService.Db;
 
 namespace WeatherService.Scheduled
 {
@@ -42,6 +35,7 @@ namespace WeatherService.Scheduled
                         BuildWeatherData(jobParams, stationId, targetDate);
 
                     Debug(weatherData);
+                    //TODO for andy....
                    // weatherRepository.InsertWeatherData(weatherData);
 
                 }
@@ -51,6 +45,7 @@ namespace WeatherService.Scheduled
             {
                 Console.WriteLine("Error: " + ex.Message);
             }
+
             return Task.FromResult(0);
         }
 
