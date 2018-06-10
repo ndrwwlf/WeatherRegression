@@ -29,7 +29,7 @@ namespace WeatherService.Scheduled
                     .UsingJobData("city", "Hello World!")
                     .StartNow()
                     //.WithSimpleSchedule(x => x.WithIntervalInMinutes(ScheduleIntervalInMinute).RepeatForever())
-                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(1))
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(0))
                     .Build();
 
                 await scheduler.ScheduleJob(job, trigger);

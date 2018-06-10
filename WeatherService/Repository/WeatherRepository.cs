@@ -102,16 +102,6 @@ namespace WeatherService.Db
 
         public bool InsertWeatherData(WeatherDataDTO weatherDataDTO)
         {
-            //string stationId = weatherDataDTO.StationId;
-            //var rDate = weatherDataDTO.DateTime.ToShortDateString();
-            //int highTmp = (int)Math.Round(weatherDataDTO.MaxF);
-            //int lowTmp = (int)Math.Round(weatherDataDTO.MinF);
-            //int avgTmp = (int)Math.Round(weatherDataDTO.AvgF);
-            //int dewPt = (int)Math.Round(weatherDataDTO.DewPtAvgF);
-
-            //weatherData.DateTime = weatherData.DateTime.Date;
-            //DateTime.ToShortDateString();
-
             string sql = @"
             INSERT INTO [WeatherData] ([StationId], [RDate], [HighTmp], [LowTmp], [AvgTmp], [DewPt]) 
             VALUES (@StationId, @RDate, @HighTmp, @LowTmp, @AvgTmp, @DewPT);
@@ -120,15 +110,15 @@ namespace WeatherService.Db
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 //int id = db.Execute(sql, new { stationId, rDate, highTmp, lowTmp, avgTmp, dewPt });
-                int id = db.Execute(sql, new {
-                    weatherDataDTO.StationId,
+                int rowsAffected = db.Execute(sql, new {
+                    StationID = weatherDataDTO.StationId,
                     RDate = weatherDataDTO.DateTime.ToShortDateString(),
                     HighTmp = (int)Math.Round(weatherDataDTO.MaxF),
                     LowTmp = (int)Math.Round(weatherDataDTO.MinF),
                     AvgTmp = (int)Math.Round(weatherDataDTO.AvgF),
                     DewPt = (int)Math.Round(weatherDataDTO.DewPtAvgF)
             });
-                return true;
+                return (rowsAffected == 1);
             }
         }
 

@@ -30,26 +30,12 @@ namespace WeatherService.Scheduled
 
                 List<string> stationIds = weatherRepository.GetDistinctLocationSationIds();
 
-                //stationIds.ForEach(delegate (string stationId)
-                //{
-                //    WeatherDataDTO weatherDataDTO = BuildWeatherData(jobParams, stationId, targetDate);
-                //    weatherRepository.InsertWeatherData(weatherDataDTO);
-                //});
+                stationIds.ForEach(delegate (string stationId)
+                {
+                    WeatherDataDTO weatherDataDTO = BuildWeatherData(jobParams, stationId, targetDate);
 
-                WeatherDataDTO weatherDataDTO = BuildWeatherData(jobParams, "KSEA", targetDate);
-                weatherRepository.InsertWeatherData(weatherDataDTO);
-
-                //for (int i = 0; i < stationIds.Count; i++)
-                //{
-                //    WeatherDataDTO weatherDataDTO =
-                //        BuildWeatherData(jobParams, stationIds.ElementAt(i), targetDate);
-
-                //    Debug(weatherDataDTO);
-                //    //TODO for andy....
-                //    weatherRepository.InsertWeatherData(weatherDataDTO);
-
-                //}
-
+                    weatherRepository.InsertWeatherData(weatherDataDTO);
+                });
             }
             catch (Exception ex)
             {
