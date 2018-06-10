@@ -16,6 +16,6 @@ namespace WeatherService.Services
         bool GetZipCodeExist(string ZipCode);
         bool GetLocationExist(int LocationID);
 
-        bool InsertWeatherData(WeatherData weatherData);
+        bool InsertWeatherData(WeatherDataDTO weatherDataDTO);
     }
 }

@@ -7,6 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using WeatherService.Db;
+using WeatherService.Dto;
 using WeatherService.Model;
 using WeatherService.Services;
 
@@ -29,17 +30,26 @@ namespace WeatherService.Scheduled
 
                 List<string> stationIds = weatherRepository.GetDistinctLocationSationIds();
 
-                foreach (string stationId in stationIds)
-                {
-                    WeatherData weatherData = 
-                        BuildWeatherData(jobParams, stationId, targetDate);
+                //stationIds.ForEach(delegate (string stationId)
+                //{
+                //    WeatherDataDTO weatherDataDTO = BuildWeatherData(jobParams, stationId, targetDate);
+                //    weatherRepository.InsertWeatherData(weatherDataDTO);
+                //});
 
-                    Debug(weatherData);
-                    //TODO for andy....
-                   // weatherRepository.InsertWeatherData(weatherData);
+                WeatherDataDTO weatherDataDTO = BuildWeatherData(jobParams, "KSEA", targetDate);
+                weatherRepository.InsertWeatherData(weatherDataDTO);
 
-                }
-                
+                //for (int i = 0; i < stationIds.Count; i++)
+                //{
+                //    WeatherDataDTO weatherDataDTO =
+                //        BuildWeatherData(jobParams, stationIds.ElementAt(i), targetDate);
+
+                //    Debug(weatherDataDTO);
+                //    //TODO for andy....
+                //    weatherRepository.InsertWeatherData(weatherDataDTO);
+
+                //}
+
             }
             catch (Exception ex)
             {
@@ -54,12 +64,12 @@ namespace WeatherService.Scheduled
             return new WeatherRepository(jobParams.DatabaseConnectionString);
         }
 
-        private void Debug(WeatherData weatherData)
+        private void Debug(WeatherDataDTO weatherDataDTO)
         {
             Console.WriteLine("stationId = {0}, dateTime = {1}, maxF = {2}, minF = {3}, " +
-                    "avgF = {4}, DewPtAvgF = {5}", weatherData.StationId,
-                    weatherData.DateTime, weatherData.MaxF, weatherData.MinF,
-                    weatherData.AvgF, weatherData.DewPtAvgF);
+                    "avgF = {4}, DewPtAvgF = {5}", weatherDataDTO.StationId,
+                    weatherDataDTO.DateTime, weatherDataDTO.MaxF, weatherDataDTO.MinF,
+                    weatherDataDTO.AvgF, weatherDataDTO.DewPtAvgF);
         }
 
         private AerisJobParams AerisJobParamsValueOf(IJobExecutionContext context)
@@ -68,7 +78,7 @@ namespace WeatherService.Scheduled
             return (AerisJobParams)schedulerContext.Get("aerisJobParams");
         }
 
-        private WeatherData BuildWeatherData(AerisJobParams jobParams, string stationId, DateTime targetDate)
+        private WeatherDataDTO BuildWeatherData(AerisJobParams jobParams, string stationId, DateTime targetDate)
         {
             
             AerisResult result = GetAerisResponse(jobParams, stationId, targetDate);
@@ -79,15 +89,17 @@ namespace WeatherService.Scheduled
             Temp temp = summary.temp;
             Dewpt dewpt = summary.dewpt;
 
-            WeatherData weatherData = new WeatherData();
-            weatherData.StationId = response.id;
-            weatherData.DateTime = summary.dateTimeISO;
-            weatherData.MaxF = temp.maxF;
-            weatherData.MinF = temp.minF;
-            weatherData.AvgF = temp.avgF;
-            weatherData.DewPtAvgF = dewpt.avgF;
+            WeatherDataDTO weatherDataDTO = new WeatherDataDTO
+            {
+                StationId = response.id,
+                DateTime = summary.dateTimeISO,
+                MaxF = temp.maxF,
+                MinF = temp.minF,
+                AvgF = temp.avgF,
+                DewPtAvgF = dewpt.avgF
+            };
 
-            return weatherData;
+            return weatherDataDTO;
         }
 
         private AerisResult GetAerisResponse(AerisJobParams aerisJobParams, string stationId, DateTime targetDate)
