@@ -14,7 +14,7 @@ insert into [Location] values('55407', 'KMSP');
 CREATE Table [WeatherData] (
   Id INT NOT NULL IDENTITY(1,1)	PRIMARY KEY,
   StationId VARCHAR(10) NOT NULL,
-  CreateDate DATE NOT NULL,
+  RDate DATE NOT NULL,
   HighTmp SMALLINT NOT NULL,
   LowTmp SMALLINT NOT NULL,
   AvgTmp SMALLINT NOT NULL,
