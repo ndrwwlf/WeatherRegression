@@ -1,10 +1,23 @@
 ﻿-- user: foo, pwd: bar
 
 CREATE Table [Location] (
-  Id	INT	NOT NULL	IDENTITY	PRIMARY KEY,
-  ZipCode	VARCHAR(10)	NOT NULL
+  Id	INT	NOT NULL	IDENTITY(1,1)	PRIMARY KEY,
+  ZipCode	VARCHAR(10)	NOT NULL,
+  StationId VARCHAR(10)
 );
 
-insert into [Location] values('59801');
-insert into [Location] values('59804');
-insert into [Location] values('59803-123');
+insert into [Location] values('59801', 'KMSO');
+insert into [Location] values('59804', 'KMSO');
+insert into [Location] values('55407', 'KMSP');
+
+
+CREATE Table [WeatherData] (
+  Id INT NOT NULL IDENTITY(1,1)	PRIMARY KEY,
+  StationId VARCHAR(10) NOT NULL,
+  CreateDate DATE NOT NULL,
+  HighTmp SMALLINT NOT NULL,
+  LowTmp SMALLINT NOT NULL,
+  AvgTmp SMALLINT NOT NULL,
+  DewPt TINYINT NOT NULL
+);
+

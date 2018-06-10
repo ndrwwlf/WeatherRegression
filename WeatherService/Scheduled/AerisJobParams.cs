@@ -9,5 +9,6 @@ namespace WeatherService.Scheduled
     {
         public string AerisAccessId { get; set; }
         public string AerisSecretKey { get; set; }
+        public string DatabaseConnectionString { get; set; }
     }
 }
