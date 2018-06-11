@@ -133,5 +133,56 @@ namespace WeatherService.Db
 
             return data;
         }
+
+        public List<WeatherData> GetWeatherData(PageParams pageParams)
+        {
+            var data = new List<WeatherData>();
+
+            string Sql = @"SELECT ID, RTRIM(StationId) AS StationId, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData 
+                           ORDER BY RDate DESC, StationId ASC
+                           OFFSET ((@PageNumber - 1) * @RowsPerPage) ROWS
+                           FETCH NEXT @RowsPerPage ROWS ONLY";
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                data = db.Query<WeatherData>(Sql, new { pageParams.PageNumber, pageParams.RowsPerPage }).AsList();
+
+                return data;
+            }
+        }
+        public List<WeatherData> GetWeatherDataByStationId(string StationId, PageParams pageParams)
+        {
+            var data = new List<WeatherData>();
+
+            string Sql = @"SELECT ID, (RTRIM(StationId)) as StationId, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData 
+                           WHERE StationId = @StationId 
+                           ORDER BY RDate DESC, StationId ASC 
+                           OFFSET ((@PageNumber - 1) * @RowsPerPage) ROWS 
+                           FETCH NEXT @RowsPerPage ROWS ONLY";
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                data = db.Query<WeatherData>(Sql, new { StationId, pageParams.PageNumber, pageParams.RowsPerPage }).AsList();
+
+                return data;
+            }
+        }
+
+        public int GetWeatherDataRowCount(string StationId)
+        {
+            var sql = @"SELECT COUNT(*) FROM WeatherData WHERE StationId = @StationId";
+
+            if (StationId == "all")
+            {
+                sql = @"SELECT COUNT(*) FROM WeatherData WHERE StationId IS NOT NULL";
+            }
+
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                int count = db.ExecuteScalar<int>(sql, new{ StationId });
+
+                return count;
+            }
+        }
     }
 }

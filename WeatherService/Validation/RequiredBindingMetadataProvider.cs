@@ -23,6 +23,10 @@ namespace WeatherService.Validation
             {
                 context.BindingMetadata.BindingSource = BindingSource.Body;
             }
+            else if (context.Key.Name == null && context.Key.ModelType == typeof(PageParams))
+            {
+                context.BindingMetadata.BindingSource = BindingSource.Body;
+            }
         }
 
         public void GetBindingMetadata(BindingMetadataProviderContext context)

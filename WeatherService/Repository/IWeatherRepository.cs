@@ -16,6 +16,9 @@ namespace WeatherService.Services
         bool GetZipCodeExist(string ZipCode);
         bool GetLocationExist(int LocationID);
 
+        List<WeatherData> GetWeatherData(PageParams pageParams);
+        List<WeatherData> GetWeatherDataByStationId(string StationId, PageParams pageParams);
+        int GetWeatherDataRowCount(string StationId);
         bool InsertWeatherData(WeatherDataDTO weatherDataDTO);
     }
 }
