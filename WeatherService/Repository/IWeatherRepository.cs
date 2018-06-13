@@ -19,5 +19,9 @@ namespace WeatherService.Services
 
         bool InsertWeatherData(WeatherData weatherData);
         bool GetWeatherDataExist(string stationId, DateTime rDate);
+        List<WeatherData> GetWeatherData(PageParams pageParams);
+        List<WeatherData> GetWeatherDataByStationId(string StationId, PageParams pageParams);
+        int GetWeatherDataRowCount(string StationId);
+
     }
 }

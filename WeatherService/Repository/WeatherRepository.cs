@@ -145,5 +145,20 @@ namespace WeatherService.Db
                     new { StationId=stationId, RDate=date });
             }
         }
+
+        public List<WeatherData> GetWeatherData(PageParams pageParams)
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<WeatherData> GetWeatherDataByStationId(string StationId, PageParams pageParams)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetWeatherDataRowCount(string StationId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

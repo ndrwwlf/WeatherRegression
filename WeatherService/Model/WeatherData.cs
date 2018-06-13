@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WeatherService.Model
 {
@@ -14,5 +11,9 @@ namespace WeatherService.Model
         public double MinF { get; set; }
         public double AvgF { get; set; }
         public double DewPtAvgF { get; set; }
+        public double HighTmp { get; set; }
+        public double LowTmp { get; set; }
+        public double AvgTmp { get; set; }
+        public double DewPt { get; set; }
     }
 }
