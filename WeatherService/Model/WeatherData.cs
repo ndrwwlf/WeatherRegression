@@ -9,7 +9,7 @@ namespace WeatherService.Model
     {
         public int Id { get; set; }
         public string StationId { get; set; }
-        public DateTime DateTime { get; set; }
+        public DateTime RDate { get; set; }
         public double MaxF { get; set; }
         public double MinF { get; set; }
         public double AvgF { get; set; }

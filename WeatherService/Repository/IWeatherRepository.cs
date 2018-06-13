@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using WeatherService.Db;
 using WeatherService.Dto;
 using WeatherService.Model;
@@ -16,6 +17,7 @@ namespace WeatherService.Services
         bool GetZipCodeExist(string ZipCode);
         bool GetLocationExist(int LocationID);
 
-        bool InsertWeatherData(WeatherDataDTO weatherDataDTO);
+        bool InsertWeatherData(WeatherData weatherData);
+        bool GetWeatherDataExist(string stationId, DateTime rDate);
     }
 }

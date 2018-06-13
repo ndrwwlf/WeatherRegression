@@ -100,7 +100,7 @@ namespace WeatherService.Db
             }
         }
 
-        public bool InsertWeatherData(WeatherDataDTO weatherDataDTO)
+        public bool InsertWeatherData(WeatherData weatherData)
         {
             string sql = @"
             INSERT INTO [WeatherData] ([StationId], [RDate], [HighTmp], [LowTmp], [AvgTmp], [DewPt]) 
@@ -110,14 +110,16 @@ namespace WeatherService.Db
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 //int id = db.Execute(sql, new { stationId, rDate, highTmp, lowTmp, avgTmp, dewPt });
-                int rowsAffected = db.Execute(sql, new {
-                    StationID = weatherDataDTO.StationId,
-                    RDate = weatherDataDTO.DateTime.ToShortDateString(),
-                    HighTmp = (int)Math.Round(weatherDataDTO.MaxF),
-                    LowTmp = (int)Math.Round(weatherDataDTO.MinF),
-                    AvgTmp = (int)Math.Round(weatherDataDTO.AvgF),
-                    DewPt = (int)Math.Round(weatherDataDTO.DewPtAvgF)
-            });
+                int rowsAffected = db.Execute(sql, new
+                {
+                    StationID = weatherData.StationId,
+                    RDate = weatherData.RDate.ToShortDateString(),
+                    HighTmp = (int)Math.Round(weatherData.MaxF),
+                    LowTmp = (int)Math.Round(weatherData.MinF),
+                    AvgTmp = (int)Math.Round(weatherData.AvgF),
+                    DewPt = (int)Math.Round(weatherData.DewPtAvgF)
+                });
+
                 return (rowsAffected == 1);
             }
         }
@@ -132,6 +134,16 @@ namespace WeatherService.Db
             }
 
             return data;
+        }
+
+        public bool GetWeatherDataExist(string stationId, DateTime rDate)
+        {
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                DateTime date = Convert.ToDateTime(rDate.ToShortDateString());
+                return db.ExecuteScalar<bool>("select count(1) from WeatherData where StationId=@StationId AND RDate=@RDate", 
+                    new { StationId=stationId, RDate=date });
+            }
         }
     }
 }
