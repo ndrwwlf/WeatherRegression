@@ -29,8 +29,8 @@ namespace WeatherService
             .AddDebug();
 
             AerisJobParams aerisJobParams = new AerisJobParams();
-            aerisJobParams.AerisAccessId = "pvgTjAD4onCI2NmIqcC4T";
-            aerisJobParams.AerisSecretKey = "lNuane8qGpRMYVxBQC1mZyYdj3cKtQVGswqz5cNe";
+            aerisJobParams.AerisAccessId = "vgayNZkz1o2JK6VRhOTBZ";
+            aerisJobParams.AerisSecretKey = "8YK1bmJlOPJCIO2darWs48qmXPKzGxQHdWWzWmNg";
             aerisJobParams.DatabaseConnectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
             SchedulerJob.RunAsync(aerisJobParams).GetAwaiter().GetResult();
         }

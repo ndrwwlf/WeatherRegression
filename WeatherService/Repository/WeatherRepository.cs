@@ -19,130 +19,50 @@ namespace WeatherService.Db
             _connectionString = connectionString;
         }
 
-        public List<Location> GetLocations()
+        public List<string> GetDistinctZipCodes()
         {
-            var data = new List<Location>();
+            var data = new List<string>();
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                data = db.Query<Location>("select ID, RTRIM(ZipCode) as ZipCode, RTRIM(StationId) as StationId from Location").ToList();
+                data = db.Query<string>("select DISTINCT(RTRIM(ZipCode)) as ZipCode from Location WHERE ZipCode IS NOT NULL").ToList();
             }
 
             return data;
         }
 
-        public Location GetLocation(int id)
-        {
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                return db.Query<Location>("SELECT * FROM Location WHERE ID = @ID", 
-                          new { ID = id }).SingleOrDefault();
-            }
-        }
-
-        public Location InsertLocation(PutPostLocation putPostLocation)
-        {
-            string sql = @"
-            INSERT INTO [Location] ([ZipCode]) VALUES (@ZipCode);
-            SELECT CAST(SCOPE_IDENTITY() as int)";
-
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                int id = db.Query<int>(sql, new { putPostLocation.ZipCode }).Single();
-                Location location = new Location
-                {
-                    Id = id,
-                    ZipCode = putPostLocation.ZipCode
-                };
-                return location;
-            }
-        }
-
-        public bool DeleteLocation(int id)
-        {
-            string sql = "DELETE FROM [Location] WHERE ID = @ID";
-
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                var affectedRows = db.Execute(sql, new { id });
-
-                return affectedRows > 0;
-            }
-        }
-
-        public Location UpdateLocation(Location location)
-        {
-            string sql = @"UPDATE [Location] SET [ZipCode] = @ZipCode WHERE ID = @ID";
-
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                db.Execute(sql, new { location.ZipCode, location.Id });
-            }
-
-            return location;
-        }
-
-        public bool GetZipCodeExist(string zipCode)
-        {
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                var exists = db.ExecuteScalar<bool>("select count(1) from Location where ZipCode=@ZipCode", new { zipCode });
-                return exists;
-            }
-        }
-
-        public bool GetLocationExist(int id)
-        {
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                var exists = db.ExecuteScalar<bool>("select count(1) from Location where ID=@ID", new { id });
-                return exists;
-            }
-        }
-
         public bool InsertWeatherData(WeatherData weatherData)
         {
             string sql = @"
-            INSERT INTO [WeatherData] ([StationId], [RDate], [HighTmp], [LowTmp], [AvgTmp], [DewPt]) 
-            VALUES (@StationId, @RDate, @HighTmp, @LowTmp, @AvgTmp, @DewPT);
+            INSERT INTO [WeatherData] ([StationId], [ZipCode], [RDate], [HighTmp], [LowTmp], [AvgTmp], [DewPt]) 
+            VALUES (@StationId, @ZipCode, @RDate, @HighTmp, @LowTmp, @AvgTmp, @DewPT);
             SELECT CAST(SCOPE_IDENTITY() as int)";
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                //int id = db.Execute(sql, new { stationId, rDate, highTmp, lowTmp, avgTmp, dewPt });
                 int rowsAffected = db.Execute(sql, new
                 {
                     StationID = weatherData.StationId,
+                    ZipCode = weatherData.ZipCode,
                     RDate = weatherData.RDate.ToShortDateString(),
-                    HighTmp = (int)Math.Round(weatherData.MaxF),
-                    LowTmp = (int)Math.Round(weatherData.MinF),
-                    AvgTmp = (int)Math.Round(weatherData.AvgF),
-                    DewPt = (int)Math.Round(weatherData.DewPtAvgF)
+                    HighTmp = (int)Math.Round(weatherData.HighTmp),
+                    LowTmp = (int)Math.Round(weatherData.LowTmp),
+                    AvgTmp = (int)Math.Round(weatherData.AvgTmp),
+                    DewPt = (int)Math.Round(weatherData.DewPt)
+
                 });
 
                 return (rowsAffected == 1);
             }
         }
 
-        public List<string> GetDistinctLocationSationIds()
-        {
-            var data = new List<string>();
-
-            using (IDbConnection db = new SqlConnection(_connectionString))
-            {
-                data = db.Query<string>("select DISTINCT(RTRIM(StationId)) as StationId from Location WHERE StationId IS NOT NULL").ToList();
-            }
-
-            return data;
-        }
-
-        public bool GetWeatherDataExist(string stationId, DateTime rDate)
+        public bool GetWeatherDataExistForZipAndDate(string zipCode, DateTime rDate)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 DateTime date = Convert.ToDateTime(rDate.ToShortDateString());
-                return db.ExecuteScalar<bool>("select count(1) from WeatherData where StationId=@StationId AND RDate=@RDate", 
-                    new { StationId=stationId, RDate=date });
+                return db.ExecuteScalar<bool>("select count(1) from WeatherData where ZipCode=@ZipCode AND RDate=@RDate", 
+                    new { ZipCode= zipCode, RDate=date });
             }
         }
 
@@ -162,35 +82,39 @@ namespace WeatherService.Db
             } 
         } 
 
-        public List<WeatherData> GetWeatherDataByStationId(string StationId, PageParams pageParams)
+        public List<WeatherData> GetWeatherDataByZipCode(string zipCode, PageParams pageParams)
         { 
             var data = new List<WeatherData>();
 
-            string Sql = @"SELECT ID, (RTRIM(StationId)) as StationId, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData  
-                             WHERE StationId = @StationId  
+            string Sql = @"SELECT ID, (RTRIM(StationId)) as StationId, ZipCode, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData  
+                             WHERE ZipCode = @ZipCode  
                              ORDER BY RDate DESC, StationId ASC  
                              OFFSET ((@PageNumber - 1) * @RowsPerPage) ROWS  
                              FETCH NEXT @RowsPerPage ROWS ONLY";
 
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
-                data = db.Query<WeatherData>(Sql, new { StationId, pageParams.PageNumber, pageParams.RowsPerPage }).AsList();
+                data = db.Query<WeatherData>(Sql, new { zipCode, pageParams.PageNumber, pageParams.RowsPerPage }).AsList();
                 return data;
             } 
-        } 
+        }
 
-        public int GetWeatherDataRowCount(string StationId)
-        { 
-            var sql = @"SELECT COUNT(*) FROM WeatherData WHERE StationId = @StationId"; 
-            if (StationId == "all") 
-            { 
-                sql = @"SELECT COUNT(*) FROM WeatherData WHERE StationId IS NOT NULL"; 
+        public int GetWeatherDataRowCount(string ZipCode)
+        {
+            string sql = @"SELECT COUNT(*) FROM WeatherData WHERE ZipCode IS NOT NULL";
+            using (IDbConnection db = new SqlConnection(_connectionString))
+            {
+                return db.ExecuteScalar<int>(sql, new { ZipCode });
             }
+        }
 
+        public int GetWeatherDataRowCountByZip(string ZipCode)
+        { 
+            var sql = @"SELECT COUNT(*) FROM WeatherData WHERE ZipCode = @ZipCode"; 
+         
             using (IDbConnection db = new SqlConnection(_connectionString)) 
             { 
-                int count = db.ExecuteScalar<int>(sql, new { StationId }); 
-                return count; 
+                return db.ExecuteScalar<int>(sql, new { ZipCode }); 
             } 
         }  
     } 

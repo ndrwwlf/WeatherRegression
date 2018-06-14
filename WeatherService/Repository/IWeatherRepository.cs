@@ -8,20 +8,12 @@ namespace WeatherService.Services
 {
     public interface IWeatherRepository
     {
-        List<Location> GetLocations();
-        List<string> GetDistinctLocationSationIds();
-        Location GetLocation(int id);
-        Location InsertLocation(PutPostLocation location);
-        bool DeleteLocation(int id);
-        Location UpdateLocation(Location location);
-        bool GetZipCodeExist(string ZipCode);
-        bool GetLocationExist(int LocationID);
-
+        List<string> GetDistinctZipCodes();
         bool InsertWeatherData(WeatherData weatherData);
-        bool GetWeatherDataExist(string stationId, DateTime rDate);
+        bool GetWeatherDataExistForZipAndDate(string ZipCode, DateTime rDate);
         List<WeatherData> GetWeatherData(PageParams pageParams);
-        List<WeatherData> GetWeatherDataByStationId(string StationId, PageParams pageParams);
-        int GetWeatherDataRowCount(string StationId);
-
+        List<WeatherData> GetWeatherDataByZipCode(string ZipCode, PageParams pageParams);
+        int GetWeatherDataRowCount(string ZipCode);
+        int GetWeatherDataRowCountByZip(string ZipCode);
     }
 }
