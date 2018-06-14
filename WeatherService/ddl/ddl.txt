@@ -3,13 +3,8 @@
 
 CREATE Table [Location] (
   Id	INT	NOT NULL	IDENTITY(1,1)	PRIMARY KEY,
-  ZipCode	VARCHAR(10)	NOT NULL,
-  StationId VARCHAR(10)
+  ZipCode	VARCHAR(10)	NOT NULL
 );
-
-insert into [Location] values('00766', 'KMSO');
-insert into [Location] values('00777', 'KMSO');
-insert into [Location] values('00791', 'KMSP');
 
 
 CREATE Table [WeatherData] (
@@ -26,11 +21,11 @@ CREATE Table [WeatherData] (
 select distinct LEN(LZip) from Locations;
 
 
-00766
-00777
-00791
-01002
-01460
+insert into [Location] (ZipCode) values('00766');
+insert into [Location] (ZipCode) values('00777');
+insert into [Location] (ZipCode) values('00791');
+insert into [Location] (ZipCode) values('01002');
+insert into [Location] (ZipCode) values('01460');
 01801
 01923
 02048
