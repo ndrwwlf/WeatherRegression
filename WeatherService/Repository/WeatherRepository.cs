@@ -70,7 +70,7 @@ namespace WeatherService.Db
        { 
             var data = new List<WeatherData>();
 
-            string Sql = @"SELECT ID, RTRIM(StationId) AS StationId, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData  
+            string Sql = @"SELECT ID, RTRIM(StationId) AS StationId, ZipCode, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData  
                 ORDER BY RDate DESC, StationId ASC 
                 OFFSET ((@PageNumber - 1) * @RowsPerPage) ROWS 
                 FETCH NEXT @RowsPerPage ROWS ONLY"; 
