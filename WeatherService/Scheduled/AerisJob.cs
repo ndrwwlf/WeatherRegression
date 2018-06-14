@@ -26,8 +26,8 @@ namespace WeatherService.Scheduled
                 AerisJobParams jobParams = AerisJobParamsValueOf(context);
                 IWeatherRepository weatherRepository = WeatherRepositoryValueOf(jobParams);
 
-                RunHistorical(weatherRepository, jobParams);
-                //RunNightly(weatherRepository, jobParams, -1);
+                //RunHistorical(weatherRepository, jobParams, 10);
+                Run(weatherRepository, jobParams, -1);
 
             }
             catch (Exception ex)
@@ -43,26 +43,26 @@ namespace WeatherService.Scheduled
             DateTime targetDate = DateTime.Now.AddDays(i);
             Console.WriteLine(targetDate.ToShortDateString());
 
-            List<string> stationIds = weatherRepository.GetDistinctLocationSationIds();
+            List<string> zipCodes = weatherRepository.GetDistinctZipCodes();
 
-            stationIds.ForEach(delegate (string stationId)
+            zipCodes.ForEach(delegate (string zipCode)
             {
-                if (!weatherRepository.GetWeatherDataExist(stationId, targetDate))
+                if (!weatherRepository.GetWeatherDataExistForZipAndDate(zipCode, targetDate))
                 {
-                    WeatherData weatherData = BuildWeatherData(jobParams, stationId, targetDate);
+                    WeatherData weatherData = BuildWeatherData(jobParams, zipCode, targetDate);
                     weatherRepository.InsertWeatherData(weatherData);
                 } else
                 {
-                    Console.WriteLine("data already exists for {0} and {1}", 
-                        stationId, targetDate.ToShortDateString());
+                    Console.WriteLine("data already exists for {0} and {1}",
+                        zipCode, targetDate.ToShortDateString());
                 }
 
             });
         }
 
-        private void RunHistorical(IWeatherRepository weatherRepository, AerisJobParams jobParams)
+        private void RunHistorical(IWeatherRepository weatherRepository, AerisJobParams jobParams, int j)
         {
-            for (int i = -180; i <= -120; i++)
+            for (int i = -925; i <= -900; i++)
             {
                 Run(weatherRepository, jobParams, i);
             }
@@ -73,24 +73,16 @@ namespace WeatherService.Scheduled
             return new WeatherRepository(jobParams.DatabaseConnectionString);
         }
 
-        private void Debug(WeatherDataDTO weatherDataDTO)
-        {
-            Console.WriteLine("stationId = {0}, dateTime = {1}, maxF = {2}, minF = {3}, " +
-                    "avgF = {4}, DewPtAvgF = {5}", weatherDataDTO.StationId,
-                    weatherDataDTO.DateTime, weatherDataDTO.MaxF, weatherDataDTO.MinF,
-                    weatherDataDTO.AvgF, weatherDataDTO.DewPtAvgF);
-        }
-
         private AerisJobParams AerisJobParamsValueOf(IJobExecutionContext context)
         {
             var schedulerContext = context.Scheduler.Context;
             return (AerisJobParams)schedulerContext.Get("aerisJobParams");
         }
 
-        private WeatherData BuildWeatherData(AerisJobParams jobParams, string stationId, DateTime targetDate)
+        private WeatherData BuildWeatherData(AerisJobParams jobParams, string zipCode, DateTime targetDate)
         {
             
-            AerisResult result = GetAerisResponse(jobParams, stationId, targetDate);
+            AerisResult result = GetAerisResponse(jobParams, zipCode, targetDate);
 
             Response response = result.response.First();
             Summary summary = response.periods.First().summary;
@@ -101,23 +93,24 @@ namespace WeatherService.Scheduled
             WeatherData weatherData = new WeatherData
             {
                 StationId = response.id,
+                ZipCode = zipCode,
                 RDate = targetDate,
-                MaxF = temp.maxF,
-                MinF = temp.minF,
-                AvgF = temp.avgF,
-                DewPtAvgF = dewpt.avgF
+                HighTmp = temp.maxF,
+                LowTmp = temp.minF,
+                AvgTmp = temp.avgF,
+                DewPt = dewpt.avgF
             };
 
             return weatherData;
         }
 
-        private AerisResult GetAerisResponse(AerisJobParams aerisJobParams, string stationId, DateTime targetDate)
+        private AerisResult GetAerisResponse(AerisJobParams aerisJobParams, string zipCode, DateTime targetDate)
         {
             
             string fromDate = targetDate.Date.ToString("MM/dd/yyyy");
             string toDate = targetDate.Date.AddDays(1).ToString("MM/dd/yyyy");
-
-            string rootUrl = $"http://api.aerisapi.com/observations/summary/closest?p={stationId}&range.from={fromDate}&range.to={toDate}&fields=id,periods.summary.dateTimeISO,periods.summary.temp.maxF,periods.summary.temp.minF,periods.summary.temp.avgF,periods.summary.dewpt.avgF";
+            string rootUrl = $"http://api.aerisapi.com/observations/summary/closest?p={zipCode}&query=maxt:!NULL,mint:!NULL,avgt:!NULL,avgdewpt:!NULL&fields=id,loc,place,periods.summary.dateTimeISO,periods.summary.temp.maxF,periods.summary.temp.minF,periods.summary.temp.avgF,periods.summary.dewpt.avgF&from={fromDate}&to={toDate}&plimit=1";
+            rootUrl += "&fields=id,periods.summary.dateTimeISO,periods.summary.temp.maxF,periods.summary.temp.minF,periods.summary.temp.avgF,periods.summary.dewpt.avgF";
             
             StringBuilder builder = new StringBuilder();
             builder.Append(rootUrl);

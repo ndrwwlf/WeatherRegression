@@ -42,19 +42,19 @@ namespace WeatherService.Controllers
         }
 
         // GET: api/WeatherData/KMSO/WeatherData?PageNumber=1&RowsPerPage=20
-        [HttpGet("{StationId}")]
+        [HttpGet("{ZipCpde}")]
         [ProducesResponseType(200, Type = typeof(List<WeatherData>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult Get([FromRoute]string StationId, [FromQuery]PageParams pageParams)
+        public IActionResult Get([FromRoute]string ZipCpde, [FromQuery]PageParams pageParams)
         {
-            int total = _weatherRepository.GetWeatherDataRowCount(StationId);
+            int total = _weatherRepository.GetWeatherDataRowCount(ZipCpde);
 
             if (total < 1)
             {
-                return NotFound(new { message = "Weather Station not found for StationId " + StationId });
+                return NotFound(new { message = "Weather Station not found for ZipCode " + ZipCpde });
             }
-            List<WeatherData> data = _weatherRepository.GetWeatherDataByStationId(StationId, pageParams);
+            List<WeatherData> data = _weatherRepository.GetWeatherDataByZipCode(ZipCpde, pageParams);
 
             return Ok(new
             {
