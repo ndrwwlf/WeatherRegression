@@ -1,4 +1,5 @@
-﻿-- user: foo, pwd: bar
+﻿use weather;
+
 
 CREATE Table [Location] (
   Id	INT	NOT NULL	IDENTITY(1,1)	PRIMARY KEY,

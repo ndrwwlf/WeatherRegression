@@ -25,7 +25,6 @@ namespace WeatherService.Controllers
         public IActionResult Get([FromQuery]PageParams pageParams)
         {
             int total = _weatherRepository.GetWeatherDataRowCount("all");
-
             List<WeatherData> data = _weatherRepository.GetWeatherData(pageParams);
 
             return Ok(new
@@ -55,7 +54,6 @@ namespace WeatherService.Controllers
             {
                 return NotFound(new { message = "Weather Station not found for StationId " + StationId });
             }
-
             List<WeatherData> data = _weatherRepository.GetWeatherDataByStationId(StationId, pageParams);
 
             return Ok(new
