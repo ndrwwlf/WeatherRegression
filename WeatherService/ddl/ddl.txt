@@ -18,14 +18,17 @@ CREATE Table [WeatherData] (
   DewPt SMALLINT NOT NULL
 );
 
-select distinct LEN(LZip) from Locations;
-
+-- select distinct LEN(LZip) from Locations;
 
 insert into [Location] (ZipCode) values('00766');
 insert into [Location] (ZipCode) values('00777');
 insert into [Location] (ZipCode) values('00791');
 insert into [Location] (ZipCode) values('01002');
 insert into [Location] (ZipCode) values('01460');
+
+
+select * from WeatherData;
+
 01801
 01923
 02048
