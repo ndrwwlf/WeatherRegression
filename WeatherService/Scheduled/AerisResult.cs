@@ -1,43 +1,56 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace WeatherService.Scheduled
 {
-
     public class AerisResult
     {
-        public bool success { get; set; }
-        public object error { get; set; }
-        public IList<Response> response { get; set; }
+        public bool Success { get; set; }
+        public object Error { get; set; }
+        public IList<Response> Response { get; set; }
     }
 
     public class Response
     {
-        public string id { get; set; }
-        public IList<Period> periods { get; set; }
+        public string Id { get; set; }
+        public IList<Period> Periods { get; set; }
     }
 
     public class Temp
     {
-        public int maxF { get; set; }
-        public int minF { get; set; }
-        public double avgF { get; set; }
+        public double? MaxF { get; set; }
+        public double? MinF { get; set; }
+        public double? AvgF { get; set; }
     }
 
     public class Dewpt
     {
-        public double avgF { get; set; }
+        public double? AvgF { get; set; }
     }
 
     public class Summary
     {
-        public DateTime dateTimeISO { get; set; }
-        public Temp temp { get; set; }
-        public Dewpt dewpt { get; set; }
+        public DateTime DateTimeISO { get; set; }
+        public Temp Temp { get; set; }
+        public Dewpt Dewpt { get; set; }
     }
 
     public class Period
     {
-        public Summary summary { get; set; }
+        public Summary Summary { get; set; }
     }
+
+    //public class Loc
+    //{
+    //    public double? Latitude { get; set; }
+    //    public double? Longitude { get; set; }
+    //}
+
+    //public class Place
+    //{
+    //    public string Name { get; set; }
+    //    public string State { get; set; }
+    //}
 }

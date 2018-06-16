@@ -29,9 +29,13 @@ namespace WeatherService
             .AddDebug();
 
             AerisJobParams aerisJobParams = new AerisJobParams();
-            aerisJobParams.AerisAccessId = "vgayNZkz1o2JK6VRhOTBZ";
-            aerisJobParams.AerisSecretKey = "8YK1bmJlOPJCIO2darWs48qmXPKzGxQHdWWzWmNg";
-            aerisJobParams.DatabaseConnectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
+            aerisJobParams.AerisAccessId = "OykRW4nKiliWp4Ge6YsGy";
+            aerisJobParams.AerisSecretKey = "MGeWiicMgXt7nRD0o2LQ5rwW5uAKoCUdgU46WbZ4";
+            //aerisJobParams.AerisAccessId = "vgayNZkz1o2JK6VRhOTBZ";
+            //aerisJobParams.AerisSecretKey = "8YK1bmJlOPJCIO2darWs48qmXPKzGxQHdWWzWmNg";
+            //aerisJobParams.DatabaseConnectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
+            aerisJobParams.DefaultConnectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
+            aerisJobParams.JitWebData3ConnectionString = Configuration.GetSection("ConnectionStrings:JitWebData3Connection").Value;
             SchedulerJob.RunAsync(aerisJobParams).GetAwaiter().GetResult();
         }
 
@@ -51,7 +55,8 @@ namespace WeatherService
             });
 
             string connectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
-            services.AddSingleton<IWeatherRepository>(c => new WeatherRepository(connectionString));
+            string jitWebData3ConnectionString = Configuration.GetSection("ConnectionStrings:JitWebData3Connection").Value;
+            services.AddSingleton<IWeatherRepository>(c => new WeatherRepository(connectionString, jitWebData3ConnectionString));
 
         }
 
