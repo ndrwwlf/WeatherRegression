@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using WeatherService.Dao;
 using WeatherService.Db;
 using WeatherService.Dto;
 using WeatherService.Model;
@@ -18,28 +19,66 @@ namespace WeatherService.Scheduled
        
         public Task Execute(IJobExecutionContext context)
         {
-            
-            Console.WriteLine("Execute Task starting...");
 
+            AerisJobParams jobParams = AerisJobParamsValueOf(context);
+            IWeatherRepository weatherRepository = WeatherRepositoryValueOf(jobParams);
+
+            //GatherWeatherData();
+
+            PopulateWthExpdUsageTable(weatherRepository);
+
+            return Task.FromResult(0);
+        }
+
+        private void PopulateWthExpdUsageTable(IWeatherRepository weatherRepository)
+        {
+            // Normalized Energy Usage = E = B1(DAYS) + B2(HDDB3) + B4(CDDB5)
+            // [10662.9796123151 x (Days)] + [0 x (HDDB3)] + [88.12471482 x (CDDB5)]
+            // HDDB3 = SUM OF ALL HEATING DEGREE DAYS IN BILLING PERIOD (if there were 31 days)
+            /*
+             * EXAMPLE OF HEATING DEGREE DAYS AND COOLING DEGREE DAYS
+                Baseline = 60
+                Mean Daily Temp was 70
+                Then 10 Cooling Degree Days for that Day
+
+                Baseline = 60
+                Mean Daily Temp was 45
+                Then 15 Heating Degree Days for that Day
+            */
             try
             {
-                AerisJobParams jobParams = AerisJobParamsValueOf(context);
-                IWeatherRepository weatherRepository = WeatherRepositoryValueOf(jobParams);
+                
+                List<ReadingsQueryResult> readings = weatherRepository.GetReadings("12-1-2016");
 
-                RunHistorical(weatherRepository, jobParams);
-                //Run(weatherRepository, jobParams, -1);
-
-
+                foreach (ReadingsQueryResult result in readings)
+                {
+                    Console.WriteLine(result.B1);
+                    // List<WeatherData> weatherDataList = weatherRepository.GetWeatherDataByZipStartAndEndDate();
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error: " + ex.Message);
             }
-
-            return Task.FromResult(0);
+           
         }
 
-        private void Run(IWeatherRepository weatherRepository, AerisJobParams jobParams, int i)
+        private void GatherWeatherData(AerisJobParams jobParams, IWeatherRepository weatherRepository)
+        {
+            Console.WriteLine("Execute Task starting...");
+
+            try
+            {
+                //GatherHistoricalWeatherData(weatherRepository, jobParams);
+                GatherDailyWeatherData(weatherRepository, jobParams, -1);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+        }
+
+        private void GatherDailyWeatherData(IWeatherRepository weatherRepository, AerisJobParams jobParams, int i)
         {
             DateTime targetDate = DateTime.Now.AddDays(i);
             Console.WriteLine(targetDate.ToShortDateString());
@@ -65,7 +104,7 @@ namespace WeatherService.Scheduled
             };
         }
 
-        private void RunHistorical(IWeatherRepository weatherRepository, AerisJobParams jobParams)
+        private void GatherHistoricalWeatherData(IWeatherRepository weatherRepository, AerisJobParams jobParams)
         {
             DateTime today = DateTime.Now;
 
@@ -77,7 +116,7 @@ namespace WeatherService.Scheduled
 
             for (int i = days; i <= -1; i++)
             {
-                Run(weatherRepository, jobParams, i);
+                GatherDailyWeatherData(weatherRepository, jobParams, i);
             };
         }
 

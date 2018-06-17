@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using WeatherService.Dao;
 using WeatherService.Dto;
 using WeatherService.Model;
 using WeatherService.Services;
@@ -125,6 +126,30 @@ namespace WeatherService.Db
             { 
                 return db.ExecuteScalar<int>(sql, new { ZipCode }); 
             } 
-        }  
+        }
+
+        public List<ReadingsQueryResult> GetReadings(string DateStart)
+        {
+            var data = new List<ReadingsQueryResult>();
+
+            string Sql = @"select b.Zip, r.DateStart,  r.DateEnd, r.Days, r.UnitID as rUnitID, w.UnitID as wnpUnitID,
+	              w.B1, w.B2, w.B3, w.B4, w.B5
+	            from Readings r join WthNormalParams w on r.AccID = w.AccID
+	              join Accounts a on a.AccID = r.AccID
+	              join Buildings b on b.BldID = a.BldID
+	            where r.UnitID = w.UnitID
+                    and r.DateStart >= @DateStart
+	            order by DateStart";
+
+            using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+            {
+                return db.Query<ReadingsQueryResult>(Sql, new { DateStart }).AsList();
+            }
+        }
+
+        public List<WeatherData> GetWeatherDataByZipStartAndEndDate(string zip, DateTime DateStart, DateTime DateEnd)
+        {
+            throw new NotImplementedException();
+        }
     } 
 }

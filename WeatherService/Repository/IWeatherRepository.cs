@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using WeatherService.Dao;
 using WeatherService.Db;
 using WeatherService.Dto;
 using WeatherService.Model;
@@ -15,5 +16,7 @@ namespace WeatherService.Services
         List<WeatherData> GetWeatherDataByZipCode(string ZipCode, PageParams pageParams);
         int GetWeatherDataRowCount(string ZipCode);
         int GetWeatherDataRowCountByZip(string ZipCode);
+        List<ReadingsQueryResult> GetReadings(string DateStart);
+        List<WeatherData> GetWeatherDataByZipStartAndEndDate(string zip, DateTime DateStart, DateTime DateEnd);
     }
 }
