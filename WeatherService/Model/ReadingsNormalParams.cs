@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace WeatherService.Model
 {
-    public class ReadingsNormalParams
-    {
-        public long AccID { get; set; }
-        public long UtilID
-        public long UnitID
-        public 
-    }
+    //public class ReadingsNormalParams
+    //{
+    //    public long AccID { get; set; }
+    //    public long UtilID
+    //    public long UnitID
+    //    public 
+    //}
 
     //{
     //    public WthNormalParams WthNormalParams { get; set; }
