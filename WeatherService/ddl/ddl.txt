@@ -27,3 +27,147 @@ insert into [Location] (ZipCode) values('01002');
 insert into [Location] (ZipCode) values('01460');
 
 /* andy, paste in your select statements here since we can't copy, etc. */
+
+
+
+use JitWebData3
+
+select distinct Zip from dbo.Buildings;
+
+select count(*) from Accounts where DateInv > '12-1-2016';
+
+select top(10)* from Buildings;
+
+select top(10)* from Accounts;
+
+select * from WthNormalParams;
+
+select * from WthNormalParams where AccId = 22654;
+
+
+select  * from WthNormalParams w where AccId in 
+	(select AccId from WthNormalParams group by AccId having count(AccId) > 1);
+
+select distinct AccId, UtilId from WthNormalParams;
+
+select top(10)* from Readings;
+
+select count(distinct AccId) from Readings;
+
+select count(Buildings.BldID)  from Buildings  join Accounts on Buildings.BldId = Accounts.BldID;
+
+select count(*) from Accounts a join Buildings b on a.BldID = b.BldID where b.Zip is null; 
+
+select l.* from Accounts a 
+	join Buildings b on a.BldID = b.BldID 
+	join Locations l on b.LocID = l.LocID
+    where b.Zip is null; 
+
+
+select * from Readings where Accid = 22654;
+select distinct DateStart, DateEnd from Readings where AccID = 22654;
+
+select w.*, r.DateStart, r.DateEnd, r.[Days] from WthNormalParams w join readings r on w.AccID = r.accid;
+
+select count(a.AccID) from Readings r join accounts a on r.AccID = a.AccID;
+
+select * from UnitTypes;
+
+select * from UnitBaseb;
+
+select count(*)
+
+select top(10)* from ReadingN;
+
+--Sierra is the supplier, do NOT enter usage: 23270, 23289
+
+--
+select w.AccID, w.UtilID, w.UnitID, w.B1, w.B2, w.B3, w.B4, w.B5, 
+	    r.RdngID, r.DateStart, r.DateEnd, r.Days, r.UnitID, r.Units, b.Zip,
+		l.LZip, u.CnvFct 
+	from WthNormalParams w 
+	join Accounts a on w.AccID = a.AccID
+	join Readings r on  a.AccID = r.AccID and r.DateStart >= '2016-12-01'
+	join Buildings b on a.BldID = b.BldID
+	join Locations l on b.LocID = l.LocID
+	join UnitTypes u on w.UnitID = u.UnitID 
+	order by r.DateStart, w.AccID
+
+
+	
+--	where not exists (
+--		select w.UnitId from WthNormalParams w where r.UnitID = w.UnitID)
+--	); 
+--u.unitID, u.UnitM, u.CnvFct, u.CnvGrp, u.CnvFct2, u.CnvGrp2
+	
+select r.RdngID, r.DateStart, r.DateEnd, b.Zip, w.* from Readings r 
+	join WthNormalParams w on r.AccID = w.AccID 
+	join Accounts a on w.AccID = a.AccID
+	join Buildings b on a.BldID = b.BldID 
+	where r.DateStart >= '2016-12-01' order by r.DateStart asc;
+
+	--22675
+	select * from Buildings b join Accounts a on b.BldID = a.BldID where a.AccID = 22657;
+
+
+--v--v--this one? 
+select distinct b.Zip from Readings r 
+	join WthNormalParams w on r.AccID = w.AccID 
+	join Accounts a on w.AccID = a.AccID
+	join Buildings b on a.BldID = b.BldID 
+	where r.DateStart >= '2016-12-01';
+
+--v--v--not this?
+select distinct Zip from Buildings as b 
+                    join Accounts as a on b.BldID = a.BldID
+                    join WthNormalParams as w on a.AccID = w.AccID
+					join Readings r on a.AccID = r.AccID;
+
+
+
+
+select * from WthNormalParams where EndDate like '2016-12-01';
+
+select * from WthNormalParams;
+
+select * from WthExpUsage;
+
+
+
+
+select * from Readings r join WthNormalParams w on r.AccID = w.AccID;
+
+select distinct l.LZip, b.Zip from Locations as l join Buildings as b on l.LocID = b.LocID 
+join Accounts as a on b.BldID = a.BldID join WthNormalParams as w on a.AccID = w.AccID; 
+where l.LZip is not null;
+
+
+
+select distinct l.LZip from Locations as l join Buildings as b  
+join Accounts as a on b.BldID = a.BldID 
+join WthNormalParams as w on a.AccID = w.AccID;
+
+
+
+select * from Accounts join WthNormalParams on Accounts.AccID = WthNormalParams.AccID;
+
+select * from UnitTypes;
+
+select distinct LZip from Locations;
+
+select distinct LZip from Locations where LEN(LZip) = 5;
+
+select count(*) from Locations;
+
+select distinct LEN(Zip) from Buildings;
+
+select b.zip from WthNormalParams w join Accounts a on w.AccID = a.AccID join Buildings b on a.BldID = b.BldID;
+
+select  b.Zip, a.*
+	from WthNormalParams w 
+	join Accounts a on w.AccID = a.AccID
+	join Readings r on  a.AccID = r.AccID and r.DateStart >= '2016-12-01'
+	join Buildings b on a.BldID = b.BldID
+	join Locations l on b.LocID = l.LocID
+	join UnitTypes u on w.UnitID = u.UnitID 
+	where b.Zip is null;
