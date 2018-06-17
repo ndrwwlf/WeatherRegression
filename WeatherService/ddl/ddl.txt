@@ -1,30 +1,17 @@
 ﻿use weather;
 
 
-CREATE Table [Location] (
-  Id	INT	NOT NULL	IDENTITY(1,1)	PRIMARY KEY,
-  ZipCode	VARCHAR(10)	NOT NULL
-);
-
-
 CREATE Table [WeatherData] (
   Id INT NOT NULL IDENTITY(1,1)	PRIMARY KEY,
   StationId VARCHAR(10) NOT NULL,
   ZipCode VARCHAR(10)	NOT NULL,
   RDate DATE NOT NULL,
-  HighTmp SMALLINT NOT NULL,
-  LowTmp SMALLINT NOT NULL,
-  AvgTmp SMALLINT NOT NULL,
-  DewPt SMALLINT NOT NULL
+  HighTmp FLOAT,
+  LowTmp FLOAT,
+  AvgTmp FLOAT,
+  DewPt FLOAT
 );
 
--- select distinct LEN(LZip) from Locations;
-
-insert into [Location] (ZipCode) values('00766');
-insert into [Location] (ZipCode) values('00777');
-insert into [Location] (ZipCode) values('00791');
-insert into [Location] (ZipCode) values('01002');
-insert into [Location] (ZipCode) values('01460');
 
 /* andy, paste in your select statements here since we can't copy, etc. */
 

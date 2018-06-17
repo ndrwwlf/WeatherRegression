@@ -29,13 +29,16 @@ namespace WeatherService
             .AddDebug();
 
             AerisJobParams aerisJobParams = new AerisJobParams();
-            aerisJobParams.AerisAccessId = "OykRW4nKiliWp4Ge6YsGy";
-            aerisJobParams.AerisSecretKey = "MGeWiicMgXt7nRD0o2LQ5rwW5uAKoCUdgU46WbZ4";
-            //aerisJobParams.AerisAccessId = "vgayNZkz1o2JK6VRhOTBZ";
-            //aerisJobParams.AerisSecretKey = "8YK1bmJlOPJCIO2darWs48qmXPKzGxQHdWWzWmNg";
-            //aerisJobParams.DatabaseConnectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
+            // andy's are next
+            //aerisJobParams.AerisAccessId = "OykRW4nKiliWp4Ge6YsGy";
+            //aerisJobParams.AerisSecretKey = "MGeWiicMgXt7nRD0o2LQ5rwW5uAKoCUdgU46WbZ4";
+            // these are jit's
+            aerisJobParams.AerisAccessId = "vgayNZkz1o2JK6VRhOTBZ";
+            aerisJobParams.AerisSecretKey = "8YK1bmJlOPJCIO2darWs48qmXPKzGxQHdWWzWmNg";
+            
             aerisJobParams.DefaultConnectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
             aerisJobParams.JitWebData3ConnectionString = Configuration.GetSection("ConnectionStrings:JitWebData3Connection").Value;
+
             SchedulerJob.RunAsync(aerisJobParams).GetAwaiter().GetResult();
         }
 

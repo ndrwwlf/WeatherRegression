@@ -26,7 +26,6 @@ namespace WeatherService.Scheduled
 
                 ITrigger trigger = TriggerBuilder.Create()
                     .WithIdentity("JobTrigger")
-                    .UsingJobData("city", "Hello World!")
                     .StartNow()
                     //.WithSimpleSchedule(x => x.WithIntervalInMinutes(ScheduleIntervalInMinute).RepeatForever())
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(0))

@@ -14,7 +14,6 @@ namespace WeatherService.Db
     {
         private readonly string _connectionString;
         private readonly string _jitWebData3ConnectionString;
-        //private int i;
 
         public WeatherRepository(string connectionString, string jitWebData3ConnectionString)
         {
@@ -56,61 +55,24 @@ namespace WeatherService.Db
                     RDate = weatherData.RDate.ToShortDateString(),
                     HighTmp = weatherData.HighTmp,
                     LowTmp = weatherData.LowTmp,
-                    AvgTmp = (int?)(weatherData.AvgTmp.HasValue ? Math.Round(weatherData.AvgTmp.Value) : weatherData.AvgTmp),
-                    DewPT = (int?)(weatherData.DewPt.HasValue ? Math.Max(0, Math.Round(weatherData.DewPt.Value)) : weatherData.DewPt)
+                    AvgTmp = weatherData.AvgTmp,
+                    DewPT = weatherData.DewPt
                 });
 
                 return (rowsAffected == 1);
             }
         }
 
-        //public bool InsertWeatherData(WeatherData weatherData)
-        //{
-        //    string sql = @"
-        //    INSERT INTO [WeatherData] ([WstID], [RDate], [HighTmp], [LowTmp], [AvgTmp], [DewPt]) 
-        //    VALUES (@WstID, @RDate, @HighTmp, @LowTmp, @AvgTmp, @DewPT);
-        //    SELECT CAST(SCOPE_IDENTITY() as int)";
-
-        //    using (IDbConnection db = new SqlConnection(_connectionString))
-        //    {
-        //        int rowsAffected = db.Execute(sql, new
-        //        {
-        //            WstID = weatherData.ZipCode,
-        //            RDate = weatherData.RDate.ToShortDateString(),
-        //            HighTmp = (int)Math.Round(weatherData.HighTmp),
-        //            LowTmp = (int)Math.Round(weatherData.LowTmp),
-        //            AvgTmp = (int)Math.Round(weatherData.AvgTmp),
-        //            DewPt = (int)Math.Round(weatherData.DewPt)
-        //            //this fucker can't be negative... this this'll work
-        //            //DewPt = Math.Max(0, (int)Math.Round(weatherData.DewPt))
-        //        });
-
-        //        return (rowsAffected == 1);
-        //    }
-        //}
-
         public bool GetWeatherDataExistForZipAndDate(string zipCode, DateTime rDate)
         {
             using (IDbConnection db = new SqlConnection(_connectionString))
             {
                 DateTime date = Convert.ToDateTime(rDate.ToShortDateString());
-                Console.WriteLine("hotdog");
                 bool exists = db.ExecuteScalar<bool>("select count(1) from WeatherData where ZipCode=@ZipCode AND RDate=@RDate",
                     new { ZipCode = zipCode, RDate = date });
-                Console.WriteLine(exists);
                 return exists;
             }
 
-            //using (IDbConnection db = new SqlConnection(_connectionString))
-            //{
-            //    DateTime date = Convert.ToDateTime(rDate.ToShortDateString());
-            //    Console.WriteLine("hotdog");
-            //    bool exists = db.ExecuteScalar<bool>("select count(1) from WstDateZip where ZipCode=@ZipCode AND RDate=@RDate",
-            //        new { ZipCode = zipCode, RDate = date });
-            //    Console.WriteLine(exists);
-            //    //db.Close();
-            //    return exists;
-            //}
         }
 
         public List<WeatherData> GetWeatherData(PageParams pageParams)

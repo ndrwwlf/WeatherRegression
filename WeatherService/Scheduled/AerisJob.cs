@@ -26,8 +26,8 @@ namespace WeatherService.Scheduled
                 AerisJobParams jobParams = AerisJobParamsValueOf(context);
                 IWeatherRepository weatherRepository = WeatherRepositoryValueOf(jobParams);
 
-                //RunHistorical(weatherRepository, jobParams, 30);
-                Run(weatherRepository, jobParams, -1);
+                RunHistorical(weatherRepository, jobParams);
+                //Run(weatherRepository, jobParams, -1);
 
 
             }
@@ -46,9 +46,6 @@ namespace WeatherService.Scheduled
 
             List<string> zipCodes = weatherRepository.GetDistinctZipCodes();
 
-            zipCodes.Add("80482");
-            zipCodes.Add("94304");
-
             foreach (string zipCode in zipCodes)
             {
                 if (!weatherRepository.GetWeatherDataExistForZipAndDate(zipCode, targetDate))
@@ -56,7 +53,6 @@ namespace WeatherService.Scheduled
                     try
                     {
                         WeatherData weatherData = BuildWeatherData(jobParams, zipCode, targetDate);
-
                         weatherRepository.InsertWeatherData(weatherData);
                     } catch (Exception e)
                     {
@@ -69,16 +65,17 @@ namespace WeatherService.Scheduled
             };
         }
 
-        private void RunHistorical(IWeatherRepository weatherRepository, AerisJobParams jobParams, int j, int k)
+        private void RunHistorical(IWeatherRepository weatherRepository, AerisJobParams jobParams)
         {
-            DateTime now = new DateTime().ToLocalTime();
+            DateTime today = DateTime.Now;
+
             // yyyy, mm, dd
             DateTime fromDate = new DateTime(2016, 12, 01);
-            DateTime toDate = new DateTime(2016, 12, 31);
-            int days = (int)fromDate.Subtract(toDate).TotalDays;
+            DateTime toDate = new DateTime(2018, 06, 16);
 
-            //for (int i = -925; i <= -900; i++)
-            for (int i = -1290; i <= 1261; i++)
+            int days = (int)fromDate.Subtract(today).TotalDays;
+
+            for (int i = days; i <= -1; i++)
             {
                 Run(weatherRepository, jobParams, i);
             };
@@ -110,8 +107,8 @@ namespace WeatherService.Scheduled
                 StationId = response.Id,
                 ZipCode = zipCode,
                 RDate = targetDate,
-                HighTmp = (int?)(temp.MaxF.HasValue ? (int?)Math.Round(temp.MaxF.Value) : temp.MaxF),
-                LowTmp = (int?)(temp.MinF.HasValue ? Math.Round(temp.MinF.Value) : temp.MinF),
+                HighTmp = temp.MaxF,
+                LowTmp = temp.MinF,
                 AvgTmp = temp.AvgF,
                 DewPt = dewpt.AvgF
             };
@@ -121,17 +118,18 @@ namespace WeatherService.Scheduled
 
         private AerisResult GetAerisResponse(AerisJobParams aerisJobParams, string zipCode, DateTime targetDate)
         {
-            Console.WriteLine("ZIP:sighhh {0}", zipCode);
             
             string fromDate = targetDate.Date.ToString("MM/dd/yyyy");
             string toDate = targetDate.Date.AddDays(1).ToString("MM/dd/yyyy");
-            //string rootUrl = "http://api.aerisapi.com/observations/summary/closest?p=94304&query=maxt:!NULL,maxdewpt:!NULL&from=12/03/2014&to=12/03/2014&fields=id,periods.summary.dateTimeISO,periods.summary.temp.maxF,periods.summary.temp.minF,periods.summary.temp.avgF,periods.summary.dewpt.avgF";
 
-            //string rootUrl = $"http://api.aerisapi.com/observations/summary/closest?p={zipCode}&query=maxt:!NULL,maxdewpt:!NULL" +
-            //    $"&from={fromDate}&to={toDate}&fields=id,periods.summary.dateTimeISO,periods.summary.temp.maxF,periods.summary.temp.minF,periods.summary.temp.avgF,periods.summary.dewpt.avgF";
+            /* 
+             * example
+            http://api.aerisapi.com/observations/summary/closest?p=94304&query=maxt:!NULL,maxdewpt:!NULL&from=12/03/2014&to=12/03/2014&fields=id,periods.summary.dateTimeISO,periods.summary.temp.maxF,periods.summary.temp.minF,periods.summary.temp.avgF,periods.summary.dewpt.avgF
+            */
 
             string rootUrl = $"http://api.aerisapi.com/observations/summary/closest?p={zipCode}&query=maxt:!NULL,maxdewpt:!NULL" +
-                $"&from={fromDate}&to={fromDate}&fields=id,periods.summary.dateTimeISO,periods.summary.temp.maxF,periods.summary.temp.minF,periods.summary.temp.avgF,periods.summary.dewpt.avgF";
+                $"&from={fromDate}&to={fromDate}&fields=id,periods.summary.dateTimeISO,periods.summary.temp.maxF,periods.summary.temp.minF," +
+                "periods.summary.temp.avgF,periods.summary.dewpt.avgF";
 
             StringBuilder builder = new StringBuilder();
             builder.Append(rootUrl);
@@ -141,14 +139,12 @@ namespace WeatherService.Scheduled
             builder.Append(aerisJobParams.AerisSecretKey);
 
             string url = builder.ToString();
-            Console.WriteLine("urlx = {0}", url);
+            Console.WriteLine("url: {0}", url);
 
             using (WebClient wc = new WebClient())
             {
                 var json = wc.DownloadString(url);
                 Console.WriteLine("json: {0}", json);
-                Console.WriteLine("zip = {0}", zipCode);
-                //return JsonConvert.DeserializeObject<AerisResult>(json);
                 return JsonConvert.DeserializeObject<AerisResult>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });       
             }
         }
