@@ -19,11 +19,7 @@ namespace WeatherService.Validation
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.Key.Name == null && context.Key.ModelType == typeof(PutPostLocation))
-            {
-                context.BindingMetadata.BindingSource = BindingSource.Body;
-            }
-            else if (context.Key.Name == null && context.Key.ModelType == typeof(PageParams))
+            if (context.Key.Name == null && context.Key.ModelType == typeof(PageParams))
             {
                 context.BindingMetadata.BindingSource = BindingSource.Body;
             }
