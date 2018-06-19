@@ -35,10 +35,11 @@ namespace WeatherService
             // these are jit's
             aerisJobParams.AerisAccessId = "vgayNZkz1o2JK6VRhOTBZ";
             aerisJobParams.AerisSecretKey = "8YK1bmJlOPJCIO2darWs48qmXPKzGxQHdWWzWmNg";
-            
-            aerisJobParams.DefaultConnectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
-            aerisJobParams.JitWebData3ConnectionString = Configuration.GetSection("ConnectionStrings:JitWebData3Connection").Value;
 
+
+            aerisJobParams.JitWeatherConnetionString = Configuration.GetSection("ConnectionStrings:JitWeatherConnection").Value;
+            aerisJobParams.JitWebData3ConnectionString = Configuration.GetSection("ConnectionStrings:JitWebData3Connection").Value;
+            
             SchedulerJob.RunAsync(aerisJobParams).GetAwaiter().GetResult();
         }
 
@@ -57,9 +58,11 @@ namespace WeatherService
                 c.SwaggerDoc("v1", new Info { Title = "Weather Service API", Version = "v1" });
             });
 
-            string connectionString = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
+      
             string jitWebData3ConnectionString = Configuration.GetSection("ConnectionStrings:JitWebData3Connection").Value;
-            services.AddSingleton<IWeatherRepository>(c => new WeatherRepository(connectionString, jitWebData3ConnectionString));
+            string jitWeatherConnectionString = Configuration.GetSection("ConnectionStrings:JitWeatherConnection").Value;
+
+            services.AddSingleton<IWeatherRepository>(c => new WeatherRepository(jitWeatherConnectionString, jitWebData3ConnectionString));
 
         }
 

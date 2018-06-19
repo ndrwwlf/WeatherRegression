@@ -23,9 +23,9 @@ namespace WeatherService.Scheduled
             AerisJobParams jobParams = AerisJobParamsValueOf(context);
             IWeatherRepository weatherRepository = WeatherRepositoryValueOf(jobParams);
 
-            //GatherWeatherData();
+            GatherWeatherData(jobParams, weatherRepository);
 
-            PopulateWthExpdUsageTable(weatherRepository);
+            //PopulateWthExpdUsageTable(weatherRepository);
 
             return Task.FromResult(0);
         }
@@ -47,20 +47,72 @@ namespace WeatherService.Scheduled
             */
             try
             {
-                
+
                 List<ReadingsQueryResult> readings = weatherRepository.GetReadings("12-1-2016");
 
                 foreach (ReadingsQueryResult result in readings)
                 {
-                    Console.WriteLine(result.B1);
-                    // List<WeatherData> weatherDataList = weatherRepository.GetWeatherDataByZipStartAndEndDate();
+                    //Console.WriteLine(result.DateStart + ", " + result.DateEnd + ", " + result.Days + ",  result.B1 = " + result.B1 + ",  result.B2 = " + result.B2 + ", result.B3 = " + result.B3 + ",  result.B4 = " + result.B4);
+
+                    List<WeatherData> weatherDataList = weatherRepository.GetWeatherDataByZipStartAndEndDate(result.Zip, result.DateStart, result.DateEnd);
+                    HeatingCoolingDegreeDays heatingCoolingDegreeDays = HeatingCoolingDegreeDaysValueOf(result, weatherDataList);
+
+                    DoCalculation(result, heatingCoolingDegreeDays, weatherRepository);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
            
+        }
+
+        private void DoCalculation(ReadingsQueryResult result, HeatingCoolingDegreeDays heatingCoolingDegreeDays, IWeatherRepository weatherRepository)
+        {
+            // Normalized Energy Usage = E = B1(DAYS) + B2(HDDB3) + B4(CDDB5)
+            double? resultAsDouble = (result.B1 * result.Days) + (result.B2 * heatingCoolingDegreeDays.HDD) + (result.B4 * heatingCoolingDegreeDays.CDD);
+            decimal resultAsDecimal = decimal.Round(Convert.ToDecimal(resultAsDouble), 4, MidpointRounding.AwayFromZero);
+            weatherRepository.InsertWthExpUsage(result.RdngID, resultAsDecimal);
+            Console.WriteLine("x = " + resultAsDecimal);
+        }
+
+        private HeatingCoolingDegreeDays HeatingCoolingDegreeDaysValueOf(ReadingsQueryResult result, List<WeatherData> weatherDataList)
+        {
+            HeatingCoolingDegreeDays hcdd = new HeatingCoolingDegreeDays();
+            hcdd.CDD = 0.0;
+            hcdd.HDD = 0.0;
+
+            if (result.B3 == 0 && result.B5 == 0)
+            {
+                return hcdd;
+            }
+
+            foreach (WeatherData weatherData in weatherDataList)
+            {
+                
+                //Console.WriteLine(weatherData.Id + "," + weatherData.RDate + ", " + weatherData.LowTmp + "," + weatherData.HighTmp + ", " + weatherData.AvgTmp);
+
+                if (result.B5 > 0)
+                {
+                    if (weatherData.AvgTmp >= result.B5)
+                    {
+                        hcdd.CDD = hcdd.CDD + (weatherData.AvgTmp - result.B5 );
+                    } 
+                    
+                } else if (result.B3 > 0)
+                {
+                    if (weatherData.AvgTmp <= result.B3)
+                    {
+                        hcdd.HDD = hcdd.HDD + (result.B3 - weatherData.AvgTmp);
+                    }
+                } 
+
+               // Console.WriteLine("hcdd.CDD = " + hcdd.CDD);
+               // Console.WriteLine("hcdd.HDD = " + hcdd.HDD);
+
+            }
+
+            return hcdd;
         }
 
         private void GatherWeatherData(AerisJobParams jobParams, IWeatherRepository weatherRepository)
@@ -92,6 +144,7 @@ namespace WeatherService.Scheduled
                     try
                     {
                         WeatherData weatherData = BuildWeatherData(jobParams, zipCode, targetDate);
+                        Console.WriteLine(weatherData.Id + "," + weatherData.RDate + ", " + weatherData.LowTmp + "," + weatherData.HighTmp + ", " + weatherData.AvgTmp);
                         weatherRepository.InsertWeatherData(weatherData);
                     } catch (Exception e)
                     {
@@ -110,8 +163,7 @@ namespace WeatherService.Scheduled
 
             // yyyy, mm, dd
             DateTime fromDate = new DateTime(2016, 12, 01);
-            DateTime toDate = new DateTime(2018, 06, 16);
-
+            
             int days = (int)fromDate.Subtract(today).TotalDays;
 
             for (int i = days; i <= -1; i++)
@@ -122,7 +174,7 @@ namespace WeatherService.Scheduled
 
         private IWeatherRepository WeatherRepositoryValueOf(AerisJobParams jobParams)
         {
-            return new WeatherRepository(jobParams.DefaultConnectionString, jobParams.JitWebData3ConnectionString);
+            return new WeatherRepository(jobParams.JitWeatherConnetionString, jobParams.JitWebData3ConnectionString);
         }
 
         private AerisJobParams AerisJobParamsValueOf(IJobExecutionContext context)

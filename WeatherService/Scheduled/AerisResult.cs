@@ -20,8 +20,8 @@ namespace WeatherService.Scheduled
 
     public class Temp
     {
-        public double? MaxF { get; set; }
-        public double? MinF { get; set; }
+        public int MaxF { get; set; }
+        public int MinF { get; set; }
         public double? AvgF { get; set; }
     }
 

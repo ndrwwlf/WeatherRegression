@@ -13,29 +13,27 @@ namespace WeatherService.Db
 {
     public class WeatherRepository : IWeatherRepository
     {
-        private readonly string _connectionString;
+
+        private readonly string _jitWeatherConnectionString;
         private readonly string _jitWebData3ConnectionString;
 
-        public WeatherRepository(string connectionString, string jitWebData3ConnectionString)
+        public WeatherRepository(string jitWeatherConnectionString, string jitWebData3ConnectionString)
         {
-            _connectionString = connectionString;
+            _jitWeatherConnectionString = jitWeatherConnectionString;
             _jitWebData3ConnectionString = jitWebData3ConnectionString;
+        
         }
 
         public List<string> GetDistinctZipCodes()
         {
             List<string> data = new List<string>();
 
-            //using (IDbConnection db = new SqlConnection(_connectionString))
-            //{
-            //    data = db.Query<string>("select DISTINCT(RTRIM(ZipCode)) as ZipCode from Location WHERE ZipCode IS NOT NULL").ToList();
-            //}
 
             using (IDbConnection jitWebData3Db = new SqlConnection(_jitWebData3ConnectionString))
             {
-                data = jitWebData3Db.Query<string>("select distinct Zip from Buildings as b " +
+                data = jitWebData3Db.Query<string>("select distinct b.Zip from Buildings as b " +
                     "join Accounts as a on b.BldID = a.BldID " +
-                    "join WthNormalParams as w on a.AccID = w.AccID; ").AsList();
+                    "join WthNormalParams as w on a.AccID = w.AccID").AsList();
             }
             return data;
         }
@@ -47,7 +45,7 @@ namespace WeatherService.Db
             VALUES (@StationId, @ZipCode, @RDate, @HighTmp, @LowTmp, @AvgTmp, @DewPT);
             SELECT CAST(SCOPE_IDENTITY() as int)";
 
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString))
             {
                 int rowsAffected = db.Execute(sql, new
                 {
@@ -66,7 +64,7 @@ namespace WeatherService.Db
 
         public bool GetWeatherDataExistForZipAndDate(string zipCode, DateTime rDate)
         {
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString))
             {
                 DateTime date = Convert.ToDateTime(rDate.ToShortDateString());
                 bool exists = db.ExecuteScalar<bool>("select count(1) from WeatherData where ZipCode=@ZipCode AND RDate=@RDate",
@@ -85,7 +83,7 @@ namespace WeatherService.Db
                 OFFSET ((@PageNumber - 1) * @RowsPerPage) ROWS 
                 FETCH NEXT @RowsPerPage ROWS ONLY"; 
 
-            using (IDbConnection db = new SqlConnection(_connectionString)) 
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString)) 
             { 
                data = db.Query<WeatherData>(Sql, new { pageParams.PageNumber, pageParams.RowsPerPage}).AsList(); 
                return data;
@@ -102,7 +100,7 @@ namespace WeatherService.Db
                              OFFSET ((@PageNumber - 1) * @RowsPerPage) ROWS  
                              FETCH NEXT @RowsPerPage ROWS ONLY";
 
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString))
             {
                 data = db.Query<WeatherData>(Sql, new { zipCode, pageParams.PageNumber, pageParams.RowsPerPage }).AsList();
                 return data;
@@ -111,8 +109,8 @@ namespace WeatherService.Db
 
         public int GetWeatherDataRowCount(string ZipCode)
         {
-            string sql = @"SELECT COUNT(*) FROM WeatherData WHERE ZipCode IS NOT NULL";
-            using (IDbConnection db = new SqlConnection(_connectionString))
+            string sql = @"SELECT COUNT(*) FROM [WeatherData] WHERE ZipCode IS NOT NULL";
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString))
             {
                 return db.ExecuteScalar<int>(sql, new { ZipCode });
             }
@@ -122,7 +120,7 @@ namespace WeatherService.Db
         { 
             var sql = @"SELECT COUNT(*) FROM WeatherData WHERE ZipCode = @ZipCode"; 
          
-            using (IDbConnection db = new SqlConnection(_connectionString)) 
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString)) 
             { 
                 return db.ExecuteScalar<int>(sql, new { ZipCode }); 
             } 
@@ -132,7 +130,7 @@ namespace WeatherService.Db
         {
             var data = new List<ReadingsQueryResult>();
 
-            string Sql = @"select b.Zip, r.DateStart,  r.DateEnd, r.Days, r.UnitID as rUnitID, w.UnitID as wnpUnitID,
+            string Sql = @"select r.RdngID, b.Zip, r.DateStart,  r.DateEnd, r.Days, r.UnitID as rUnitID, w.UnitID as wnpUnitID,
 	              w.B1, w.B2, w.B3, w.B4, w.B5
 	            from Readings r join WthNormalParams w on r.AccID = w.AccID
 	              join Accounts a on a.AccID = r.AccID
@@ -147,9 +145,36 @@ namespace WeatherService.Db
             }
         }
 
-        public List<WeatherData> GetWeatherDataByZipStartAndEndDate(string zip, DateTime DateStart, DateTime DateEnd)
+        public List<WeatherData> GetWeatherDataByZipStartAndEndDate(string ZipCode, DateTime DateStart, DateTime DateEnd)
         {
-            throw new NotImplementedException();
+            var data = new List<WeatherData>();
+
+            string Sql = @"SELECT ID, (RTRIM(StationId)) as StationId, (RTRIM(ZipCode)) as ZipCode, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData  
+                             WHERE ZipCode = @ZipCode  AND RDATE >= @DateStart AND RDATE <= @DateEnd ORDER BY ID";
+
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString))
+            {
+                return db.Query<WeatherData>(Sql, new { ZipCode, DateStart, DateEnd }).AsList();
+            }
+        }
+
+        public bool InsertWthExpUsage(int ReadingId, decimal ExpUsage)
+        {
+            string sql = @"
+            INSERT INTO [WthExpUsage] ([RdngID], [ExpUsage]) 
+            VALUES (@ReadingID, @ExpUsage);
+            SELECT CAST(SCOPE_IDENTITY() as int)";
+
+            using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+            {
+                int rowsAffected = db.Execute(sql, new
+                {
+                    ReadingId,
+                    ExpUsage
+                });
+
+                return (rowsAffected == 1);
+            }
         }
     } 
 }
