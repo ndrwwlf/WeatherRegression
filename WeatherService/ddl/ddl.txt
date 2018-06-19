@@ -6,10 +6,10 @@ CREATE Table [WeatherData] (
   StationId VARCHAR(10) NOT NULL,
   ZipCode VARCHAR(10)	NOT NULL,
   RDate DATE NOT NULL,
-  HighTmp FLOAT,
-  LowTmp FLOAT,
-  AvgTmp FLOAT,
-  DewPt FLOAT
+  HighTmp SMALLINT,
+  LowTmp SMALLINT,
+  AvgTmp DECIMAL(5,2),
+  DewPt DECIMAL(5,2)
 );
 
 

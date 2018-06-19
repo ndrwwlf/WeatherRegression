@@ -9,8 +9,7 @@ namespace WeatherService.Scheduled
     {
         public string AerisAccessId { get; set; }
         public string AerisSecretKey { get; set; }
-        //public string DatabaseConnectionString { get; set; }
-        public string DefaultConnectionString { get; set; }
+        public string JitWeatherConnetionString { get; set; }
         public string JitWebData3ConnectionString { get; set; }
     }
 }

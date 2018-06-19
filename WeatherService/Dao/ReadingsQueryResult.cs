@@ -7,6 +7,7 @@ namespace WeatherService.Dao
 {
     public class ReadingsQueryResult
     {
+        public int RdngID { get; set; }
         public string Zip { get; set; }
         public DateTime DateStart { get; set; }
         public DateTime DateEnd { get; set; }
