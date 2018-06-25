@@ -192,6 +192,14 @@ namespace WeatherService.Db
             VALUES (@ReadingID, @ExpUsage);
             SELECT CAST(SCOPE_IDENTITY() as int)";
 
+            /*
+             * this is using a mocked WthExpUsage table in local DB. 
+
+            CREATE TABLE [dbo].[WthExpUsage](
+	        [RdngID] [int] NOT NULL,
+	        [ExpUsage] [decimal](18, 4) NOT NULL
+            ) ON [PRIMARY]
+            */
             //using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
             using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString))
             {
