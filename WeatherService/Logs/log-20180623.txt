@@ -1,0 +1,401 @@
+2018-06-23 12:58:58.675 -06:00 [Information] Starting web host
+2018-06-23 12:59:12.775 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 12:59:12.935 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 12:59:12.966 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 12:59:12.981 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 12:59:13.000 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 12:59:13.001 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 12:59:13.001 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 12:59:13.032 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 13:00:14.683 -06:00 [Information] GatherWeatherData starting...
+2018-06-23 13:00:16.443 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 13:00:16.634 -06:00 [Information] Daily Aeris calls starting for targetDate: 6/22/2018 and 5 zip codes.
+2018-06-23 13:00:16.899 -06:00 [Information] WeatherData already exists for zip: 94043 and 6/22/2018
+2018-06-23 13:00:16.903 -06:00 [Information] WeatherData already exists for zip: 94066 and 6/22/2018
+2018-06-23 13:00:16.906 -06:00 [Information] WeatherData already exists for zip: 94089 and 6/22/2018
+2018-06-23 13:00:16.939 -06:00 [Information] WeatherData already exists for zip: 94303 and 6/22/2018
+2018-06-23 13:00:16.956 -06:00 [Information] WeatherData already exists for zip: 94304 and 6/22/2018
+2018-06-23 13:00:16.956 -06:00 [Information] Daily calls ended.
+2018-06-23 13:00:18.377 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 13:00:18.377 -06:00 [Information] Request starting HTTP/1.1 GET http://localhost:51035/swagger/  
+2018-06-23 13:00:18.489 -06:00 [Information] Request finished in 149.4848ms 200 
+2018-06-23 13:00:18.921 -06:00 [Information] Request finished in 581.5063ms 200 text/html
+2018-06-23 13:00:18.982 -06:00 [Information] Request starting HTTP/1.1 GET http://localhost:51035/swagger/swagger-ui.css  
+2018-06-23 13:00:19.005 -06:00 [Information] Request starting HTTP/1.1 GET http://localhost:51035/swagger/swagger-ui-bundle.js  
+2018-06-23 13:00:19.005 -06:00 [Information] Request starting HTTP/1.1 GET http://localhost:51035/swagger/swagger-ui-standalone-preset.js  
+2018-06-23 13:00:19.167 -06:00 [Information] Sending file. Request path: '"/swagger-ui-standalone-preset.js"'. Physical path: '"N/A"'
+2018-06-23 13:00:19.168 -06:00 [Information] Sending file. Request path: '"/swagger-ui-bundle.js"'. Physical path: '"N/A"'
+2018-06-23 13:00:19.189 -06:00 [Information] Sending file. Request path: '"/swagger-ui.css"'. Physical path: '"N/A"'
+2018-06-23 13:00:19.798 -06:00 [Information] Request finished in 816.1192ms 200 text/css
+2018-06-23 13:00:20.068 -06:00 [Information] Request finished in 1063.2178ms 200 application/javascript
+2018-06-23 13:00:20.240 -06:00 [Information] Request finished in 1235.1176ms 200 application/javascript
+2018-06-23 13:00:21.135 -06:00 [Information] Request starting HTTP/1.1 GET http://localhost:51035/swagger/v1/swagger.json  
+2018-06-23 13:00:22.295 -06:00 [Information] Request finished in 1159.2934ms 200 application/json
+2018-06-23 13:00:35.449 -06:00 [Information] Request starting HTTP/1.1 GET http://localhost:51035/api/WeatherData?PageNumber=1&RowsPerPage=1  
+2018-06-23 13:00:36.205 -06:00 [Information] Executing action method "WeatherService.Controllers.WeatherDataController.Get (WeatherService)" with arguments (["WeatherService.Dto.PageParams"]) - ModelState is Valid
+2018-06-23 13:03:24.038 -06:00 [Information] Starting web host
+2018-06-23 13:03:26.506 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 13:03:26.651 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 13:03:26.670 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 13:03:26.677 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 13:03:26.687 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 13:03:26.687 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 13:03:26.687 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 13:03:26.713 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 13:03:30.976 -06:00 [Information] GatherWeatherData starting...
+2018-06-23 13:03:31.969 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 13:03:32.585 -06:00 [Information] Daily Aeris calls starting for targetDate: 6/22/2018 and 5 zip codes.
+2018-06-23 13:03:32.735 -06:00 [Information] WeatherData already exists for zip: 94043 and 6/22/2018
+2018-06-23 13:03:32.743 -06:00 [Information] WeatherData already exists for zip: 94066 and 6/22/2018
+2018-06-23 13:03:32.745 -06:00 [Information] WeatherData already exists for zip: 94089 and 6/22/2018
+2018-06-23 13:03:32.746 -06:00 [Information] WeatherData already exists for zip: 94303 and 6/22/2018
+2018-06-23 13:03:32.748 -06:00 [Information] WeatherData already exists for zip: 94304 and 6/22/2018
+2018-06-23 13:03:32.748 -06:00 [Information] Daily calls ended.
+2018-06-23 13:03:33.377 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 13:03:33.436 -06:00 [Information] Request finished in 72.0691ms 200 
+2018-06-23 13:09:55.252 -06:00 [Information] Starting web host
+2018-06-23 13:09:57.815 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 13:09:57.931 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 13:09:57.947 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 13:09:57.957 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 13:09:57.972 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 13:09:57.973 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 13:09:57.973 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 13:09:58.007 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 13:10:13.231 -06:00 [Information] GatherWeatherData starting...
+2018-06-23 13:10:14.229 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 13:10:14.694 -06:00 [Information] Daily Aeris calls starting for targetDate: 6/22/2018 and 5 zip codes.
+2018-06-23 13:10:14.877 -06:00 [Information] WeatherData already exists for zip: 94043 and 6/22/2018
+2018-06-23 13:10:14.891 -06:00 [Information] WeatherData already exists for zip: 94066 and 6/22/2018
+2018-06-23 13:10:14.892 -06:00 [Information] WeatherData already exists for zip: 94089 and 6/22/2018
+2018-06-23 13:10:14.893 -06:00 [Information] WeatherData already exists for zip: 94303 and 6/22/2018
+2018-06-23 13:10:14.894 -06:00 [Information] WeatherData already exists for zip: 94304 and 6/22/2018
+2018-06-23 13:10:14.894 -06:00 [Information] Daily calls ended.
+2018-06-23 13:10:15.474 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 13:10:15.550 -06:00 [Information] Request finished in 86.7888ms 200 
+2018-06-23 13:11:43.175 -06:00 [Information] Starting web host
+2018-06-23 13:11:45.273 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 13:11:45.417 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 13:11:45.421 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 13:11:45.452 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 13:11:45.464 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 13:11:45.465 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 13:11:45.465 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 13:11:45.498 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 13:12:07.746 -06:00 [Information] GatherWeatherData starting...
+2018-06-23 13:13:14.783 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 12:57:55.088 -06:00 [Information] Daily Aeris calls starting for targetDate: 6/22/2018 and 5 zip codes.
+2018-06-23 12:58:05.010 -06:00 [Information] WeatherData already exists for zip: 94043 and 6/22/2018
+2018-06-23 12:58:05.037 -06:00 [Information] WeatherData already exists for zip: 94066 and 6/22/2018
+2018-06-23 12:58:05.048 -06:00 [Information] WeatherData already exists for zip: 94089 and 6/22/2018
+2018-06-23 12:58:05.049 -06:00 [Information] WeatherData already exists for zip: 94303 and 6/22/2018
+2018-06-23 12:58:05.051 -06:00 [Information] WeatherData already exists for zip: 94304 and 6/22/2018
+2018-06-23 12:58:05.051 -06:00 [Information] Daily calls ended.
+2018-06-23 12:58:05.864 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 12:58:05.920 -06:00 [Information] Request finished in 59.044ms 200 
+2018-06-23 15:45:14.437 -06:00 [Information] Starting web host
+2018-06-23 15:45:39.729 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 15:45:39.891 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 15:45:39.896 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 15:45:39.921 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 15:45:39.932 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 15:45:39.933 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 15:45:39.933 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 15:45:39.964 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 15:45:48.762 -06:00 [Error] An error occurred instantiating job to be executed. job= 'DEFAULT.AerisJob'
+Quartz.SchedulerException: Problem instantiating class 'WeatherService.Scheduled.AerisJob' ---> System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66
+   --- End of inner exception stack trace ---
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 74
+   at Quartz.Simpl.PropertySettingJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\PropertySettingJobFactory.cs:line 94
+   at Quartz.Core.JobRunShell.<Initialize>d__7.MoveNext() in C:\projects\quartznet-6fcn8\src\Quartz\Core\JobRunShell.cs:line 96 [See nested exception: System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66]
+2018-06-23 15:47:39.486 -06:00 [Information] All triggers of Job DEFAULT.AerisJob set to ERROR state.
+2018-06-23 15:47:43.458 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 15:48:02.430 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 15:48:02.483 -06:00 [Information] Request finished in 60.3415ms 200 
+2018-06-23 15:48:26.841 -06:00 [Information] Starting web host
+2018-06-23 15:48:39.600 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 15:48:39.744 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 15:48:39.747 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 15:48:39.755 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 15:48:39.769 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 15:48:39.770 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 15:48:39.770 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 15:48:39.796 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 15:48:41.218 -06:00 [Error] An error occurred instantiating job to be executed. job= 'DEFAULT.AerisJob'
+Quartz.SchedulerException: Problem instantiating class 'WeatherService.Scheduled.AerisJob' ---> System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66
+   --- End of inner exception stack trace ---
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 74
+   at Quartz.Simpl.PropertySettingJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\PropertySettingJobFactory.cs:line 94
+   at Quartz.Core.JobRunShell.<Initialize>d__7.MoveNext() in C:\projects\quartznet-6fcn8\src\Quartz\Core\JobRunShell.cs:line 96 [See nested exception: System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66]
+2018-06-23 15:48:41.352 -06:00 [Information] All triggers of Job DEFAULT.AerisJob set to ERROR state.
+2018-06-23 15:48:42.052 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 15:48:43.265 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 15:48:43.427 -06:00 [Information] Request finished in 177.7066ms 200 
+2018-06-23 15:49:35.111 -06:00 [Information] Starting web host
+2018-06-23 15:49:41.282 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 15:49:41.413 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 15:49:41.429 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 15:49:41.438 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 15:49:41.460 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 15:49:41.461 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 15:49:41.461 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 15:49:41.495 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 15:49:41.618 -06:00 [Error] An error occurred instantiating job to be executed. job= 'DEFAULT.AerisJob'
+Quartz.SchedulerException: Problem instantiating class 'WeatherService.Scheduled.AerisJob' ---> System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66
+   --- End of inner exception stack trace ---
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 74
+   at Quartz.Simpl.PropertySettingJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\PropertySettingJobFactory.cs:line 94
+   at Quartz.Core.JobRunShell.<Initialize>d__7.MoveNext() in C:\projects\quartznet-6fcn8\src\Quartz\Core\JobRunShell.cs:line 96 [See nested exception: System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66]
+2018-06-23 15:49:41.803 -06:00 [Information] All triggers of Job DEFAULT.AerisJob set to ERROR state.
+2018-06-23 15:49:42.412 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 15:54:12.898 -06:00 [Information] Starting web host
+2018-06-23 15:54:37.124 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 15:54:37.263 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 15:54:37.280 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 15:54:37.290 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 15:54:37.307 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 15:54:37.308 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 15:54:37.308 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 15:54:37.353 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 15:56:34.930 -06:00 [Information] Starting web host
+2018-06-23 15:56:39.988 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 15:56:40.160 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 15:56:40.164 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 15:56:40.172 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 15:56:40.187 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 15:56:40.187 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 15:56:40.187 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 15:56:40.219 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 15:56:40.387 -06:00 [Error] An error occurred instantiating job to be executed. job= 'DEFAULT.AerisJob'
+Quartz.SchedulerException: Problem instantiating class 'WeatherService.Scheduled.AerisJob' ---> System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66
+   --- End of inner exception stack trace ---
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 74
+   at Quartz.Simpl.PropertySettingJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\PropertySettingJobFactory.cs:line 94
+   at Quartz.Core.JobRunShell.<Initialize>d__7.MoveNext() in C:\projects\quartznet-6fcn8\src\Quartz\Core\JobRunShell.cs:line 96 [See nested exception: System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66]
+2018-06-23 15:56:40.678 -06:00 [Information] All triggers of Job DEFAULT.AerisJob set to ERROR state.
+2018-06-23 15:56:41.323 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 15:58:59.895 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 15:58:59.938 -06:00 [Information] Request finished in 50.0565ms 200 
+2018-06-23 16:06:13.987 -06:00 [Information] Starting web host
+2018-06-23 16:06:30.303 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 16:06:30.515 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 16:06:30.544 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 16:06:30.554 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 16:06:30.566 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 16:06:30.567 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 16:06:30.567 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 16:06:30.599 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 16:06:30.801 -06:00 [Error] An error occurred instantiating job to be executed. job= 'DEFAULT.AerisJob'
+Quartz.SchedulerException: Problem instantiating class 'WeatherService.Scheduled.AerisJob' ---> System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66
+   --- End of inner exception stack trace ---
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 74
+   at Quartz.Simpl.PropertySettingJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\PropertySettingJobFactory.cs:line 94
+   at Quartz.Core.JobRunShell.<Initialize>d__7.MoveNext() in C:\projects\quartznet-6fcn8\src\Quartz\Core\JobRunShell.cs:line 96 [See nested exception: System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66]
+2018-06-23 16:06:30.966 -06:00 [Information] All triggers of Job DEFAULT.AerisJob set to ERROR state.
+2018-06-23 16:06:31.554 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 16:06:39.670 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 16:06:39.721 -06:00 [Information] Request finished in 59.9505ms 200 
+2018-06-23 15:58:19.614 -06:00 [Information] Starting web host
+2018-06-23 15:58:22.017 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 15:58:22.186 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 15:58:22.202 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 15:58:22.212 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 15:58:22.240 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 15:58:22.241 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 15:58:22.241 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 15:58:22.263 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 15:58:22.482 -06:00 [Error] An error occurred instantiating job to be executed. job= 'DEFAULT.AerisJob'
+Quartz.SchedulerException: Problem instantiating class 'WeatherService.Scheduled.AerisJob' ---> System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66
+   --- End of inner exception stack trace ---
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 74
+   at Quartz.Simpl.PropertySettingJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\PropertySettingJobFactory.cs:line 94
+   at Quartz.Core.JobRunShell.<Initialize>d__7.MoveNext() in C:\projects\quartznet-6fcn8\src\Quartz\Core\JobRunShell.cs:line 96 [See nested exception: System.ArgumentException: Cannot instantiate type which has no empty constructor
+Parameter name: AerisJob
+   at Quartz.Util.ObjectUtils.InstantiateType[T](Type type) in C:\projects\quartznet-6fcn8\src\Quartz\Util\ObjectUtils.cs:line 104
+   at Quartz.Simpl.SimpleJobFactory.NewJob(TriggerFiredBundle bundle, IScheduler scheduler) in C:\projects\quartznet-6fcn8\src\Quartz\Simpl\SimpleJobFactory.cs:line 66]
+2018-06-23 15:58:22.812 -06:00 [Information] All triggers of Job DEFAULT.AerisJob set to ERROR state.
+2018-06-23 15:58:23.431 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 15:58:24.585 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 15:58:24.642 -06:00 [Information] Request finished in 54.4826ms 200 
+2018-06-23 16:01:00.928 -06:00 [Information] Starting web host
+2018-06-23 16:01:03.996 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 16:01:04.220 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 16:01:04.227 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 16:01:04.240 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 16:01:04.264 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 16:01:04.267 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 16:01:04.268 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 16:01:04.302 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 16:01:04.655 -06:00 [Information] GatherWeatherData starting...
+2018-06-23 16:01:06.394 -06:00 [Error]    at System.Data.SqlClient.SqlConnection.TryOpen(TaskCompletionSource`1 retry)
+   at System.Data.SqlClient.SqlConnection.Open()
+   at Dapper.SqlMapper.<QueryImpl>d__138`1.MoveNext() in C:\projects\dapper\Dapper\SqlMapper.cs:line 1081
+   at System.Collections.Generic.List`1.AddEnumerable(IEnumerable`1 enumerable)
+   at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
+   at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in C:\projects\dapper\Dapper\SqlMapper.cs:line 723
+   at WeatherService.Db.WeatherRepository.GetDistinctZipCodes() in C:\Users\User\Code\weather-service\WeatherService\Repository\WeatherRepository.cs:line 43
+   at WeatherService.Scheduled.AerisJob.GatherDailyWeatherData(Int32 i) in C:\Users\User\Code\weather-service\WeatherService\Scheduled\AerisJob.cs:line 129
+   at WeatherService.Scheduled.AerisJob.GatherWeatherData() in C:\Users\User\Code\weather-service\WeatherService\Scheduled\AerisJob.cs:line 117
+2018-06-23 16:01:06.537 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 16:01:08.404 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 16:01:08.468 -06:00 [Information] Request finished in 51.3043ms 200 
+2018-06-23 16:07:26.131 -06:00 [Information] Starting web host
+2018-06-23 16:07:29.699 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 16:07:29.920 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 16:07:29.945 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 16:07:29.957 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 16:07:29.977 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 16:07:29.979 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 16:07:29.980 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 16:07:30.033 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 16:09:51.508 -06:00 [Information] Starting web host
+2018-06-23 16:09:55.328 -06:00 [Information] Default Quartz.NET properties loaded from embedded resource file
+2018-06-23 16:09:55.558 -06:00 [Information] Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+2018-06-23 16:09:55.564 -06:00 [Information] Quartz Scheduler v."3.0.5.0" created.
+2018-06-23 16:09:55.580 -06:00 [Information] RAMJobStore initialized.
+2018-06-23 16:09:55.604 -06:00 [Information] Scheduler meta-data: Quartz Scheduler (v3.0.5.0) 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED'
+  Scheduler class: 'Quartz.Core.QuartzScheduler' - running locally.
+  NOT STARTED.
+  Currently in standby mode.
+  Number of jobs executed: 0
+  Using thread pool 'Quartz.Simpl.DefaultThreadPool' - with 10 threads.
+  Using job-store 'Quartz.Simpl.RAMJobStore' - which does not support persistence. and is not clustered.
+
+2018-06-23 16:09:55.606 -06:00 [Information] Quartz scheduler 'DefaultQuartzScheduler' initialized
+2018-06-23 16:09:55.606 -06:00 [Information] Quartz scheduler version: 3.0.5.0
+2018-06-23 16:09:55.647 -06:00 [Information] Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+2018-06-23 16:10:50.145 -06:00 [Information] GatherWeatherData starting...
+2018-06-23 16:10:51.642 -06:00 [Information] User profile is available. Using '"C:\Users\User\AppData\Local\ASP.NET\DataProtection-Keys"' as key repository and Windows DPAPI to encrypt keys at rest.
+2018-06-23 16:10:52.637 -06:00 [Information] Daily Aeris calls starting for targetDate: 6/22/2018 and 5 zip codes.
+2018-06-23 16:10:52.833 -06:00 [Information] WeatherData already exists for zip: 94043 and 6/22/2018
+2018-06-23 16:10:52.842 -06:00 [Information] WeatherData already exists for zip: 94066 and 6/22/2018
+2018-06-23 16:10:52.851 -06:00 [Information] WeatherData already exists for zip: 94089 and 6/22/2018
+2018-06-23 16:10:52.853 -06:00 [Information] WeatherData already exists for zip: 94303 and 6/22/2018
+2018-06-23 16:10:52.857 -06:00 [Information] WeatherData already exists for zip: 94304 and 6/22/2018
+2018-06-23 16:10:52.857 -06:00 [Information] Daily calls ended.
+2018-06-23 16:10:53.802 -06:00 [Information] Request starting HTTP/1.1 DEBUG http://localhost:51035/  0
+2018-06-23 16:10:53.884 -06:00 [Information] Request finished in 62.7241ms 200 

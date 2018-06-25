@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Quartz;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,6 @@ using System.Text;
 using System.Threading.Tasks;
 using WeatherService.Dao;
 using WeatherService.Db;
-using WeatherService.Dto;
 using WeatherService.Model;
 using WeatherService.Services;
 
@@ -16,64 +16,68 @@ namespace WeatherService.Scheduled
 {
     public class AerisJob : IJob
     {
-       
+        private  AerisJobParams _aerisJobParams;
+        private  IWeatherRepository _weatherRepository;
+
         public Task Execute(IJobExecutionContext context)
         {
+            _aerisJobParams = AerisJobParamsValueOf(context);
+            _weatherRepository = _weatherRepositoryValueOf(_aerisJobParams);
 
-            AerisJobParams jobParams = AerisJobParamsValueOf(context);
-            IWeatherRepository weatherRepository = WeatherRepositoryValueOf(jobParams);
+            Log.Information("\nI can gather all the news I need on the weather report (Weather job starting...)\n");
+            
+            GatherWeatherData();
 
-            GatherWeatherData(jobParams, weatherRepository);
+            PopulateWthExpUsageTable();
 
-            //PopulateWthExpdUsageTable(weatherRepository);
-
+            Log.Information("\nTom, get you plane right on time (Weather job finished.)\n");
             return Task.FromResult(0);
         }
 
-        private void PopulateWthExpdUsageTable(IWeatherRepository weatherRepository)
+        private void PopulateWthExpUsageTable()
         {
-            // Normalized Energy Usage = E = B1(DAYS) + B2(HDDB3) + B4(CDDB5)
-            // [10662.9796123151 x (Days)] + [0 x (HDDB3)] + [88.12471482 x (CDDB5)]
-            // HDDB3 = SUM OF ALL HEATING DEGREE DAYS IN BILLING PERIOD (if there were 31 days)
-            /*
-             * EXAMPLE OF HEATING DEGREE DAYS AND COOLING DEGREE DAYS
-                Baseline = 60
-                Mean Daily Temp was 70
-                Then 10 Cooling Degree Days for that Day
+            Log.Information("Starting PopulateWthExpUsage()...");
 
-                Baseline = 60
-                Mean Daily Temp was 45
-                Then 15 Heating Degree Days for that Day
-            */
             try
             {
-
-                List<ReadingsQueryResult> readings = weatherRepository.GetReadings("12-1-2016");
+                List<ReadingsQueryResult> readings = _weatherRepository.GetReadings("12-1-2016");
 
                 foreach (ReadingsQueryResult result in readings)
                 {
                     //Console.WriteLine(result.DateStart + ", " + result.DateEnd + ", " + result.Days + ",  result.B1 = " + result.B1 + ",  result.B2 = " + result.B2 + ", result.B3 = " + result.B3 + ",  result.B4 = " + result.B4);
+                    try
+                    {
+                        List<WeatherData> weatherDataList = _weatherRepository.GetWeatherDataByZipStartAndEndDate(result.Zip, result.DateStart, result.DateEnd);
+                        HeatingCoolingDegreeDays heatingCoolingDegreeDays = HeatingCoolingDegreeDaysValueOf(result, weatherDataList);
 
-                    List<WeatherData> weatherDataList = weatherRepository.GetWeatherDataByZipStartAndEndDate(result.Zip, result.DateStart, result.DateEnd);
-                    HeatingCoolingDegreeDays heatingCoolingDegreeDays = HeatingCoolingDegreeDaysValueOf(result, weatherDataList);
-
-                    DoCalculation(result, heatingCoolingDegreeDays, weatherRepository);
+                        DoCalculation(result, heatingCoolingDegreeDays);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error(e.Message);
+                        Log.Error(e.StackTrace);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.StackTrace);
+                Log.Error(ex.Message);
+                Log.Error(ex.StackTrace);
             }
-           
+            Log.Information("Finished PopulateWthExpUsage()");
         }
 
-        private void DoCalculation(ReadingsQueryResult result, HeatingCoolingDegreeDays heatingCoolingDegreeDays, IWeatherRepository weatherRepository)
+        private void DoCalculation(ReadingsQueryResult result, HeatingCoolingDegreeDays heatingCoolingDegreeDays)
         {
             // Normalized Energy Usage = E = B1(DAYS) + B2(HDDB3) + B4(CDDB5)
             double? resultAsDouble = (result.B1 * result.Days) + (result.B2 * heatingCoolingDegreeDays.HDD) + (result.B4 * heatingCoolingDegreeDays.CDD);
             decimal resultAsDecimal = decimal.Round(Convert.ToDecimal(resultAsDouble), 4, MidpointRounding.AwayFromZero);
-            weatherRepository.InsertWthExpUsage(result.RdngID, resultAsDecimal);
-            Console.WriteLine("x = " + resultAsDecimal);
+
+            Log.Information($"Inserting into WthExpUsage: RdngID: {result.RdngID} B1: {result.B1} B2: {result.B2} B3: {result.B3} Hdd: {heatingCoolingDegreeDays.HDD} " +
+                $"B4: {result.B4} B5: {result.B5} Cdd: {heatingCoolingDegreeDays.CDD} RdngUnitID: {result.RUnitID} WthNormalParamsUnitID: {result.WnpUnitID} " +
+                $"WthExpUsage: {resultAsDecimal}");
+
+            _weatherRepository.InsertWthExpUsage(result.RdngID, resultAsDecimal);
         }
 
         private HeatingCoolingDegreeDays HeatingCoolingDegreeDaysValueOf(ReadingsQueryResult result, List<WeatherData> weatherDataList)
@@ -89,8 +93,6 @@ namespace WeatherService.Scheduled
 
             foreach (WeatherData weatherData in weatherDataList)
             {
-                
-                //Console.WriteLine(weatherData.Id + "," + weatherData.RDate + ", " + weatherData.LowTmp + "," + weatherData.HighTmp + ", " + weatherData.AvgTmp);
 
                 if (result.B5 > 0)
                 {
@@ -106,75 +108,89 @@ namespace WeatherService.Scheduled
                         hcdd.HDD = hcdd.HDD + (result.B3 - weatherData.AvgTmp);
                     }
                 } 
-
-               // Console.WriteLine("hcdd.CDD = " + hcdd.CDD);
-               // Console.WriteLine("hcdd.HDD = " + hcdd.HDD);
-
             }
 
             return hcdd;
         }
 
-        private void GatherWeatherData(AerisJobParams jobParams, IWeatherRepository weatherRepository)
+        private void GatherWeatherData()
         {
-            Console.WriteLine("Execute Task starting...");
+            Log.Information("Starting GatherWeatherData()...");
 
             try
             {
-                //GatherHistoricalWeatherData(weatherRepository, jobParams);
-                GatherDailyWeatherData(weatherRepository, jobParams, -1);
+                GatherHistoricalWeatherData();
+                GatherDailyWeatherData(-1);
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                Log.Error(ex.Message);
+                Log.Error(ex.StackTrace);
             }
+
+            Log.Information("Finished GatherWeatherData()");
         }
 
-        private void GatherDailyWeatherData(IWeatherRepository weatherRepository, AerisJobParams jobParams, int i)
+        private void GatherDailyWeatherData(int i)
         {
             DateTime targetDate = DateTime.Now.AddDays(i);
-            Console.WriteLine(targetDate.ToShortDateString());
-
-            List<string> zipCodes = weatherRepository.GetDistinctZipCodes();
+            List<string> zipCodes = _weatherRepository.GetDistinctZipCodes();
 
             foreach (string zipCode in zipCodes)
             {
-                if (!weatherRepository.GetWeatherDataExistForZipAndDate(zipCode, targetDate))
+                if (!_weatherRepository.GetWeatherDataExistForZipAndDate(zipCode, targetDate))
                 {
                     try
                     {
-                        WeatherData weatherData = BuildWeatherData(jobParams, zipCode, targetDate);
-                        Console.WriteLine(weatherData.Id + "," + weatherData.RDate + ", " + weatherData.LowTmp + "," + weatherData.HighTmp + ", " + weatherData.AvgTmp);
-                        weatherRepository.InsertWeatherData(weatherData);
+                        Log.Information($"Starting GatherDailyWeatherData(int {i}) for targetDate: {targetDate.ToShortDateString()} and {zipCodes.Count} zip codes...");
+
+                        WeatherData weatherData = BuildWeatherData(zipCode, targetDate);
+
+                        bool success = _weatherRepository.InsertWeatherData(weatherData);
+
+                        if (success)
+                        {
+                            Log.Information("Insert Success");
+                        }
+                        else
+                        {
+                            Log.Error($"Failed attempt: insert into WeatherData >> Zip Code: {weatherData.ZipCode}, RDate: {weatherData.RDate.ToShortDateString()}, " +
+                                $"LowTmp: {weatherData.LowTmp}, HighTmp: {weatherData.HighTmp}, AvgTmp: {weatherData.AvgTmp}, DewPt: {weatherData.DewPt}");
+                        }
+
+                        Log.Information($"Finished GatherDailyWeatherData(int {i}) for {targetDate}");
+
                     } catch (Exception e)
                     {
-                        Console.WriteLine($"Error >>>> {e.Message}");
+                        Log.Error(e.Message);
+                        Log.Error(e.StackTrace);
                     }
-                } else
-                {
-                    Console.WriteLine($"data already exists for {zipCode} and {targetDate.ToShortDateString()}");
                 }
             };
         }
 
-        private void GatherHistoricalWeatherData(IWeatherRepository weatherRepository, AerisJobParams jobParams)
+        private void GatherHistoricalWeatherData()
         {
             DateTime today = DateTime.Now;
 
             // yyyy, mm, dd
             DateTime fromDate = new DateTime(2016, 12, 01);
-            
+
             int days = (int)fromDate.Subtract(today).TotalDays;
+
+            Log.Information($"Starting GatherHistoricalWeatherData(), going {days} days back from now to {fromDate}, up to yesterday.");
 
             for (int i = days; i <= -1; i++)
             {
-                GatherDailyWeatherData(weatherRepository, jobParams, i);
+                GatherDailyWeatherData(i);
             };
+
+            Log.Information("Finished GatherHistoricalWeatherData()");
         }
 
-        private IWeatherRepository WeatherRepositoryValueOf(AerisJobParams jobParams)
+        private IWeatherRepository _weatherRepositoryValueOf(AerisJobParams aerisJobParams)
         {
-            return new WeatherRepository(jobParams.JitWeatherConnetionString, jobParams.JitWebData3ConnectionString);
+            return new WeatherRepository(aerisJobParams);
         }
 
         private AerisJobParams AerisJobParamsValueOf(IJobExecutionContext context)
@@ -183,9 +199,9 @@ namespace WeatherService.Scheduled
             return (AerisJobParams)schedulerContext.Get("aerisJobParams");
         }
 
-        private WeatherData BuildWeatherData(AerisJobParams jobParams, string zipCode, DateTime targetDate)
+        private WeatherData BuildWeatherData(string zipCode, DateTime targetDate)
         {
-            AerisResult result = GetAerisResponse(jobParams, zipCode, targetDate);
+            AerisResult result = GetAerisResult(zipCode, targetDate);
 
             Response response = result.Response.First();
             Summary summary = response.Periods.First().Summary;
@@ -207,11 +223,10 @@ namespace WeatherService.Scheduled
             return weatherData;
         }
 
-        private AerisResult GetAerisResponse(AerisJobParams aerisJobParams, string zipCode, DateTime targetDate)
+        private AerisResult GetAerisResult(string zipCode, DateTime targetDate)
         {
-            
             string fromDate = targetDate.Date.ToString("MM/dd/yyyy");
-            string toDate = targetDate.Date.AddDays(1).ToString("MM/dd/yyyy");
+            Log.Information($"Calling Aeris for zip: {zipCode} and date: {fromDate}");
 
             /* 
              * example
@@ -225,9 +240,9 @@ namespace WeatherService.Scheduled
             StringBuilder builder = new StringBuilder();
             builder.Append(rootUrl);
             builder.Append("&client_id=");
-            builder.Append(aerisJobParams.AerisAccessId);
+            builder.Append(_aerisJobParams.AerisClientId);
             builder.Append("&client_secret=");
-            builder.Append(aerisJobParams.AerisSecretKey);
+            builder.Append(_aerisJobParams.AerisClientSecret);
 
             string url = builder.ToString();
             Console.WriteLine("url: {0}", url);
@@ -235,15 +250,9 @@ namespace WeatherService.Scheduled
             using (WebClient wc = new WebClient())
             {
                 var json = wc.DownloadString(url);
-                Console.WriteLine("json: {0}", json);
-                return JsonConvert.DeserializeObject<AerisResult>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });       
+                Log.Information($"JSON: {json}");                                                                  
+                return JsonConvert.DeserializeObject<AerisResult>(json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include });
             }
         }
-
-        private void GetWthNormalParamsResultSet(AerisJobParams aerisJobParams)
-        {
-            //return false;;
-        }
-
     }
 }

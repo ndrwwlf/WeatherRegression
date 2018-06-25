@@ -1,15 +1,17 @@
 ﻿
 using Quartz;
 using Quartz.Impl;
+using Serilog;
 using System;
 using System.Threading.Tasks;
 
 namespace WeatherService.Scheduled
 {
-    public class SchedulerJob
+    public class SchedulerJob 
     {
 
         public static async Task RunAsync(AerisJobParams aerisJobParams)
+        //public static async Task RunAsync()
         {
             try
             {
@@ -36,6 +38,7 @@ namespace WeatherService.Scheduled
             catch (ArgumentException e)
             {
                 Console.WriteLine(e.Message);
+                Log.Error(e.StackTrace);
             }
         }
     }

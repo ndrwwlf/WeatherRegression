@@ -16,6 +16,7 @@ namespace WeatherService.Services
         List<WeatherData> GetWeatherDataByZipCode(string ZipCode, PageParams pageParams);
         int GetWeatherDataRowCount(string ZipCode);
         int GetWeatherDataRowCountByZip(string ZipCode);
+        string GetMostRecentWeatherDataDate();
         List<ReadingsQueryResult> GetReadings(string DateStart);
         List<WeatherData> GetWeatherDataByZipStartAndEndDate(string ZipCode, DateTime DateStart, DateTime DateEnd);
         bool InsertWthExpUsage(int readingId, decimal value);

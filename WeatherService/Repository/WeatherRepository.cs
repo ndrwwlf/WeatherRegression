@@ -7,21 +7,21 @@ using System.Linq;
 using WeatherService.Dao;
 using WeatherService.Dto;
 using WeatherService.Model;
+using WeatherService.Scheduled;
+using WeatherService.Service;
 using WeatherService.Services;
 
 namespace WeatherService.Db
 {
     public class WeatherRepository : IWeatherRepository
     {
-
         private readonly string _jitWeatherConnectionString;
         private readonly string _jitWebData3ConnectionString;
 
-        public WeatherRepository(string jitWeatherConnectionString, string jitWebData3ConnectionString)
+        public WeatherRepository(AerisJobParams aerisJobParams)
         {
-            _jitWeatherConnectionString = jitWeatherConnectionString;
-            _jitWebData3ConnectionString = jitWebData3ConnectionString;
-        
+            _jitWeatherConnectionString = aerisJobParams.JitWeatherConnectionString;
+            _jitWebData3ConnectionString = aerisJobParams.JitWebData3ConnectionString;
         }
 
         public List<string> GetDistinctZipCodes()
@@ -71,7 +71,6 @@ namespace WeatherService.Db
                     new { ZipCode = zipCode, RDate = date });
                 return exists;
             }
-
         }
 
         public List<WeatherData> GetWeatherData(PageParams pageParams)
@@ -126,22 +125,50 @@ namespace WeatherService.Db
             } 
         }
 
+        public string GetMostRecentWeatherDataDate()
+        {
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString))
+            {
+                var date = db.Query<DateTime>("SELECT TOP(1) RDate FROM WeatherData ORDER BY RDate DESC").First();
+                return date.ToShortDateString();
+            }
+        } 
+
         public List<ReadingsQueryResult> GetReadings(string DateStart)
         {
+            string DateEnd = GetMostRecentWeatherDataDate();
             var data = new List<ReadingsQueryResult>();
 
-            string Sql = @"select r.RdngID, b.Zip, r.DateStart,  r.DateEnd, r.Days, r.UnitID as rUnitID, w.UnitID as wnpUnitID,
-	              w.B1, w.B2, w.B3, w.B4, w.B5
-	            from Readings r join WthNormalParams w on r.AccID = w.AccID
-	              join Accounts a on a.AccID = r.AccID
-	              join Buildings b on b.BldID = a.BldID
-	            where r.UnitID = w.UnitID
-                    and r.DateStart >= @DateStart
-	            order by DateStart";
+            string Sql = @"select r.RdngID, b.Zip, r.DateStart,  r.DateEnd, r.Days, r.UnitID as rUnitID, 
+                                  wnp.UnitID as wnpUnitID, wnp.B1, wnp.B2, wnp.B3, wnp.B4, wnp.B5
+                        from Readings r 
+                           join WthNormalParams wnp on wnp.AccID = r.AccID
+                                                    and wnp.UtilID = r.UtilID
+                                                    and wnp.UnitID = r.UnitID
+                        join Accounts a on a.AccID = r.AccID
+                        join Buildings b on b.BldID = a.BldID
+                        where not exists 
+                 (select weu.RdngID from WthExpUsage weu
+               where weu.RdngID = r.RdngID)
+                           and r.DateStart >= @DateStart
+                           and r.DateEnd <= @DateEnd
+                        order by DateStart asc";
+
+            //string Sql = @"select r.RdngID, b.Zip, r.DateStart,  r.DateEnd, r.Days, r.UnitID as rUnitID, 
+            //                      wnp.UnitID as wnpUnitID, wnp.B1, wnp.B2, wnp.B3, wnp.B4, wnp.B5
+            //            from Readings r 
+            //               join WthNormalParams wnp on wnp.AccID = r.AccID
+            //                                        and wnp.UtilID = r.UtilID
+            //                                        and wnp.UnitID = r.UnitID
+            //            join Accounts a on a.AccID = r.AccID
+            //            join Buildings b on b.BldID = a.BldID
+            //            where  r.DateStart >= @DateStart
+            //               and r.DateEnd <= @DateEnd
+            //            order by DateStart asc";
 
             using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
             {
-                return db.Query<ReadingsQueryResult>(Sql, new { DateStart }).AsList();
+                return db.Query<ReadingsQueryResult>(Sql, new { DateStart, DateEnd }).AsList();
             }
         }
 
@@ -165,7 +192,8 @@ namespace WeatherService.Db
             VALUES (@ReadingID, @ExpUsage);
             SELECT CAST(SCOPE_IDENTITY() as int)";
 
-            using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+            //using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+            using (IDbConnection db = new SqlConnection(_jitWeatherConnectionString))
             {
                 int rowsAffected = db.Execute(sql, new
                 {

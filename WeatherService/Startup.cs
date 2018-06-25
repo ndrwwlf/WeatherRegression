@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Swagger;
 using WeatherService.Db;
 using WeatherService.Scheduled;
@@ -13,7 +12,6 @@ namespace WeatherService
 {
     public class Startup
     {
-
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -22,24 +20,19 @@ namespace WeatherService
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
+            //if (env.IsDevelopment() || env.IsProduction())
+            //{
+            //    builder.AddUserSecrets<Startup>();
+            //}
+
             Configuration = builder.Build();
 
-            ILoggerFactory loggerFactory = new LoggerFactory()
-            .AddConsole()
-            .AddDebug();
-
             AerisJobParams aerisJobParams = new AerisJobParams();
-            // andy's are next
-            //aerisJobParams.AerisAccessId = "OykRW4nKiliWp4Ge6YsGy";
-            //aerisJobParams.AerisSecretKey = "MGeWiicMgXt7nRD0o2LQ5rwW5uAKoCUdgU46WbZ4";
-            // these are jit's
-            aerisJobParams.AerisAccessId = "vgayNZkz1o2JK6VRhOTBZ";
-            aerisJobParams.AerisSecretKey = "8YK1bmJlOPJCIO2darWs48qmXPKzGxQHdWWzWmNg";
+            aerisJobParams.AerisClientId = Configuration.GetSection("AerisJobParams:AerisClientID").Value;
+            aerisJobParams.AerisClientSecret = Configuration.GetSection("AerisJobParams:AerisClientSecret").Value;
+            aerisJobParams.JitWeatherConnectionString = Configuration.GetSection("AerisJobParams:JitWeatherConnectionString").Value;
+            aerisJobParams.JitWebData3ConnectionString = Configuration.GetSection("AerisJobParams:JitWebData3ConnectionString").Value;
 
-
-            aerisJobParams.JitWeatherConnetionString = Configuration.GetSection("ConnectionStrings:JitWeatherConnection").Value;
-            aerisJobParams.JitWebData3ConnectionString = Configuration.GetSection("ConnectionStrings:JitWebData3Connection").Value;
-            
             SchedulerJob.RunAsync(aerisJobParams).GetAwaiter().GetResult();
         }
 
@@ -48,6 +41,12 @@ namespace WeatherService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var aerisJobParams = new AerisJobParams();
+            Configuration.Bind("AerisJobParams", aerisJobParams);
+            services.AddSingleton(aerisJobParams);
+            services.AddSingleton<IWeatherRepository>(c => new WeatherRepository(aerisJobParams));
+            //services.AddSingleton<AerisJob>(c => new AerisJob(aerisJobParams, Configuration.Get<IWeatherRepository>()));
+
             services.AddMvc(o =>
             {
                 o.ModelMetadataDetailsProviders.Add(new RequiredBindingMetadataProvider());
@@ -57,12 +56,6 @@ namespace WeatherService
             {
                 c.SwaggerDoc("v1", new Info { Title = "Weather Service API", Version = "v1" });
             });
-
-      
-            string jitWebData3ConnectionString = Configuration.GetSection("ConnectionStrings:JitWebData3Connection").Value;
-            string jitWeatherConnectionString = Configuration.GetSection("ConnectionStrings:JitWeatherConnection").Value;
-
-            services.AddSingleton<IWeatherRepository>(c => new WeatherRepository(jitWeatherConnectionString, jitWebData3ConnectionString));
 
         }
 
