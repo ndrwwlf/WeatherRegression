@@ -22,18 +22,29 @@ namespace WeatherService.Scheduled
                 scheduler.Start().Wait();
 
                 //int ScheduleIntervalInMinute = 1;//job will run every minute
-                JobKey jobKey = JobKey.Create("AerisJob");
+                JobKey aerisKey = JobKey.Create("AerisJob");
+                JobKey regressionKey = JobKey.Create("RegressionJob");
 
-                IJobDetail job = JobBuilder.Create<AerisJob>().WithIdentity(jobKey).Build();
+                IJobDetail aerisJob = JobBuilder.Create<AerisJob>().WithIdentity(aerisKey).Build();
+                IJobDetail regressionJob = JobBuilder.Create<RegressionJob>().WithIdentity(regressionKey).Build();
 
-                ITrigger trigger = TriggerBuilder.Create()
-                    .WithIdentity("JobTrigger")
+                ITrigger aerisTrigger = TriggerBuilder.Create()
+                    .WithIdentity("AerisTrigger")
                     .StartNow()
                     //.WithSimpleSchedule(x => x.WithIntervalInMinutes(ScheduleIntervalInMinute).RepeatForever())
                     .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(0))
                     .Build();
 
-                await scheduler.ScheduleJob(job, trigger);
+                DateTimeOffset aerisJobFinished = await scheduler.ScheduleJob(aerisJob, aerisTrigger);
+
+                ITrigger regressionTrigger = TriggerBuilder.Create()
+                    .WithIdentity("RegressionTrigger")
+                    .StartAt(aerisJobFinished)
+                    //.WithSimpleSchedule(x => x.WithIntervalInMinutes(ScheduleIntervalInMinute).RepeatForever())
+                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(0))
+                    .Build();
+
+                await scheduler.ScheduleJob(regressionJob, regressionTrigger);
             }
             catch (ArgumentException e)
             {

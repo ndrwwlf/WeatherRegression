@@ -12,13 +12,24 @@ namespace WeatherService.Services
         List<string> GetDistinctZipCodes();
         bool InsertWeatherData(WeatherData weatherData);
         bool GetWeatherDataExistForZipAndDate(string ZipCode, DateTime rDate);
+        IDictionary<string, IEnumerable<string>> GetAllWeatherData();
         List<WeatherData> GetWeatherData(PageParams pageParams);
         List<WeatherData> GetWeatherDataByZipCode(string ZipCode, PageParams pageParams);
-        int GetWeatherDataRowCount(string ZipCode);
+        int GetWeatherDataRowCount();
         int GetWeatherDataRowCountByZip(string ZipCode);
-        string GetMostRecentWeatherDataDate();
         List<ReadingsQueryResult> GetReadings(string DateStart);
+        int GetExpectedWthExpUsageRowCount(string DateStart);
+        int GetActualWthExpUsageRowCount();
         List<WeatherData> GetWeatherDataByZipStartAndEndDate(string ZipCode, DateTime DateStart, DateTime DateEnd);
-        bool InsertWthExpUsage(int readingId, decimal value);
+        bool InsertWthExpUsage(int readingId, decimal value, int AccID, int UtilID, int UnitID);
+
+        List<WthNormalParams> GetNormalParamsKeysForRegression();
+        List<ReadingsQueryResult> GetReadingsForRegressionYear(string DateTimeStart, WthNormalParams accountAndUtil);
+        bool InsertWthNormalParams(WthNormalParams normalParams);
+        List<ReadingsQueryResult> GetReadingsFromExpUsageOriginal();
+        List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected();
+        WthNormalParams GetParamsForReading(int AccID, int UtilID, int UnitID);
+        bool InsertMyWthExpUsage(WthExpUsage wthExpUsage);
+        bool InsertMyWthExpUsage(WthExpUsage wthExpUsage, bool accord);
     }
 }

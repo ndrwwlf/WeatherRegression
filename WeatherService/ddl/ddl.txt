@@ -6,11 +6,16 @@ CREATE Table [WeatherData] (
   StationId VARCHAR(10) NOT NULL,
   ZipCode VARCHAR(10)	NOT NULL,
   RDate DATE NOT NULL,
-  HighTmp SMALLINT,
-  LowTmp SMALLINT,
-  AvgTmp DECIMAL(5,2),
-  DewPt DECIMAL(5,2)
+  HighTmp SMALLINT NOT NULL,
+  LowTmp SMALLINT NOT NULL,
+  AvgTmp DECIMAL(5,2) NOT NULL,
+  DewPt DECIMAL(5,2) NOT NULL
 );
+
+CREATE TABLE [dbo].[WthExpUsage](
+	        [RdngID] [int] NOT NULL,
+	        [ExpUsage] [decimal](18, 4) NOT NULL
+            ) ON [PRIMARY]
 
 
 /* andy, paste in your select statements here since we can't copy, etc. */

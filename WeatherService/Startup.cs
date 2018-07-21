@@ -16,22 +16,24 @@ namespace WeatherService
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                //.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                //.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
 
-            //if (env.IsDevelopment() || env.IsProduction())
-            //{
-            //    builder.AddUserSecrets<Startup>();
-            //}
+            if (env.IsDevelopment() || env.IsProduction())
+            {
+                builder.AddUserSecrets<Startup>();
+            }
 
             Configuration = builder.Build();
+
 
             AerisJobParams aerisJobParams = new AerisJobParams();
             aerisJobParams.AerisClientId = Configuration.GetSection("AerisJobParams:AerisClientID").Value;
             aerisJobParams.AerisClientSecret = Configuration.GetSection("AerisJobParams:AerisClientSecret").Value;
-            aerisJobParams.JitWeatherConnectionString = Configuration.GetSection("AerisJobParams:JitWeatherConnectionString").Value;
+            aerisJobParams.MyConnectionString = Configuration.GetSection("AerisJobParams:MyConnectionString").Value;
             aerisJobParams.JitWebData3ConnectionString = Configuration.GetSection("AerisJobParams:JitWebData3ConnectionString").Value;
+            aerisJobParams.RealJitWeatherConnection = Configuration.GetSection("AerisJobParams:RealJitWeatherConnection").Value;
 
             SchedulerJob.RunAsync(aerisJobParams).GetAwaiter().GetResult();
         }

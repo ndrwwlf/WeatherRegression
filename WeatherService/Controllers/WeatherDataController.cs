@@ -24,7 +24,7 @@ namespace WeatherService.Controllers
         [ProducesResponseType(200, Type = typeof(List<WeatherData>))]
         public IActionResult Get([FromQuery]PageParams pageParams)
         {
-            int total = _weatherRepository.GetWeatherDataRowCount("all");
+            int total = _weatherRepository.GetWeatherDataRowCount();
             List<WeatherData> data = _weatherRepository.GetWeatherData(pageParams);
 
             return Ok(new
@@ -46,15 +46,15 @@ namespace WeatherService.Controllers
         [ProducesResponseType(200, Type = typeof(List<WeatherData>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public IActionResult Get([FromRoute]string ZipCpde, [FromQuery]PageParams pageParams)
+        public IActionResult Get([FromRoute]string ZipCode, [FromQuery]PageParams pageParams)
         {
-            int total = _weatherRepository.GetWeatherDataRowCount(ZipCpde);
+            int total = _weatherRepository.GetWeatherDataRowCountByZip(ZipCode);
 
             if (total < 1)
             {
-                return NotFound(new { message = "Weather Station not found for ZipCode " + ZipCpde });
+                return NotFound(new { message = "Weather Station not found for ZipCode " + ZipCode });
             }
-            List<WeatherData> data = _weatherRepository.GetWeatherDataByZipCode(ZipCpde, pageParams);
+            List<WeatherData> data = _weatherRepository.GetWeatherDataByZipCode(ZipCode, pageParams);
 
             return Ok(new
             {

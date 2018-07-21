@@ -9,5 +9,12 @@ namespace WeatherService.Scheduled
     {
         public double? HDD { get; set; }
         public double? CDD { get; set; }
+        public List<double?> HddList { get; set; }
+        public List<double?> CddList { get; set; }
     }
+
+    //public HeatingCoolingDegreeDays
+    //{
+    //    HddList = new List<double?>();
+    //}
 }

@@ -9,7 +9,8 @@ namespace WeatherService.Scheduled
     {
         public string AerisClientId { get; set; }
         public string AerisClientSecret { get; set; }
-        public string JitWeatherConnectionString { get; set; }
+        public string MyConnectionString { get; set; }
         public string JitWebData3ConnectionString { get; set; }
+        public string RealJitWeatherConnection { get; set; }
     }
 }
