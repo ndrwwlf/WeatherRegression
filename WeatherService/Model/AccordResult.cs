@@ -8,8 +8,10 @@ namespace WeatherService.Model
 {
     public class AccordResult
     {
-        public MultipleLinearRegression AccordRegression { get; set; }
-        public MultipleLinearRegression NNAccordRegression { get; set; }
+        public SimpleLinearRegression SimpleLinearRegression { get; set; }
+        public MultipleLinearRegression MultipleRegression { get; set; }
+        public MultipleLinearRegression NNMultipleAccordRegression { get; set; }
+        public bool IsSimpleSingleRegression { get; set; }
         public int CoolingBP { get; set; } 
         public int HeatingBP { get; set; }
         public double Error { get; set; }

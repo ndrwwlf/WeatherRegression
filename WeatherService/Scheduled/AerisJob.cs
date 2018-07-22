@@ -241,9 +241,7 @@ namespace WeatherService.Scheduled
             HeatingCoolingDegreeDays hcdd = new HeatingCoolingDegreeDays
             {
                 CDD = 0.0,
-                HDD = 0.0,
-                CddList = new List<double?>(),
-                HddList = new List<double?>()
+                HDD = 0.0
             };
 
             if (result.B3 == 0 && result.B5 == 0)
@@ -253,32 +251,25 @@ namespace WeatherService.Scheduled
 
             foreach (WeatherData weatherData in weatherDataList)
             {
-                if (result.B5 > 0)
+                if (!weatherData.AvgTmp.HasValue)
+                {
+                    throw new Exception("WeatherData.AvgTmp is null for " + weatherData.ZipCode + " on " + weatherData.RDate);
+                }
+                else if (result.B5 > 0)
                 {
                     if (weatherData.AvgTmp >= result.B5)
                     {
-                        hcdd.CDD = hcdd.CDD + (weatherData.AvgTmp - result.B5 );
-                        hcdd.CddList.Add((weatherData.AvgTmp - result.B5));
+                        hcdd.CDD = hcdd.CDD + (weatherData.AvgTmp.Value - result.B5 );
                     }
-                    hcdd.HddList.Add(0);
                 }
                 else if (result.B3 > 0)
                 {
                     if (weatherData.AvgTmp <= result.B3)
                     {
-                        hcdd.HDD = hcdd.HDD + (result.B3 - weatherData.AvgTmp);
-                        hcdd.HddList.Add((result.B3 - weatherData.AvgTmp));
+                        hcdd.HDD = hcdd.HDD + (result.B3 - weatherData.AvgTmp.Value);
                     }
-                    hcdd.CddList.Add(0);
-                }
-                else
-                {
-                    hcdd.CddList.Add(0);
-                    hcdd.HddList.Add(0);
                 }
             }
-            //hcdd.CddList = new List<double?>();
-            //hcdd.HddList = new List<double?>(_HddList);
 
             return hcdd;
         }
