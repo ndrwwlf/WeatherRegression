@@ -19,5 +19,8 @@ namespace WeatherService.Model
         public double AdjustedR2Accord { get; set; }
         public double R2Coeff { get; set; }
         public double R2CoffAdj { get; set; }
+        public int AccID { get; set; }
+        public int UtilID { get; set; }
+        public int UnitID { get; set; }
     }
 }

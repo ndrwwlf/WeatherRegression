@@ -15,6 +15,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 using Accord.Statistics.Models.Regression.Linear;
 using Accord.Math.Optimization.Losses;
 using Accord.Statistics.Models.Regression.Fitting;
+using Accord.Statistics.Analysis;
 
 namespace WeatherService.Scheduled
 {
@@ -45,10 +46,9 @@ namespace WeatherService.Scheduled
             {
                 try
                 {
-                    string desiredStartDate = normalParamsKey.EndDate_Original.AddYears(-1).ToShortDateString();
-
-                    //
-                    //desiredStartDate = "2015-01-01";
+                    //string desiredStartDate = normalParamsKey.EndDate_Original.AddYears(-1).ToShortDateString();
+                    int yearAsInt = normalParamsKey.EndDate_Original.Year - 2000;
+                    string desiredStartDate = yearAsInt.ToString();
 
                     List<BalancePointPair> allBalancePointStatsFromYear = CalculateOneYearExpUsageForAllBalancePoints(desiredStartDate, normalParamsKey).ToList();
 
@@ -77,7 +77,7 @@ namespace WeatherService.Scheduled
                     normalParamsKey.Days = winner.DaysInNormalYear;
                     normalParamsKey.StandardError_New = decimal.Round(Convert.ToDecimal(winner.StandardError), 9, MidpointRounding.AwayFromZero);
 
-                    //_weatherRepository.InsertWthNormalParams(normalParamsKey);
+                    _weatherRepository.InsertWthNormalParams(normalParamsKey);
                 }
                 catch (Exception e)
                 {
@@ -239,14 +239,15 @@ namespace WeatherService.Scheduled
             foreach (var group in allBalancePointGroups)
             {
                 List<BalancePointPair> IdenticalBalancePointPairsForAllReadings = group.ToList();
-
-                int readingsCount = IdenticalBalancePointPairsForAllReadings.Count;
                 BalancePointPair _pointPair = IdenticalBalancePointPairsForAllReadings.First();
-                
+                int readingsCount = IdenticalBalancePointPairsForAllReadings.Count;
+
                 double[] fullYData = new double[readingsCount];
                 double[] fullYDataDailyAvg = new double[readingsCount];
 
                 double[][] hcddMatrix = new double[readingsCount][];
+
+                double[][] hcddMatrixNonDaily = new double[readingsCount][];
 
                 foreach (BalancePointPair balancePointPair in IdenticalBalancePointPairsForAllReadings)
                 {
@@ -257,6 +258,13 @@ namespace WeatherService.Scheduled
                         {
                             (balancePointPair.HeatingDegreeDays / balancePointPair.DaysInReading),
                             (balancePointPair.CoolingDegreeDays / balancePointPair.DaysInReading)
+                        };
+
+                    hcddMatrixNonDaily[IdenticalBalancePointPairsForAllReadings.IndexOf(balancePointPair)] = new double[]
+                        {
+                            balancePointPair.DaysInReading,
+                            balancePointPair.HeatingDegreeDays,
+                            balancePointPair.CoolingDegreeDays
                         };
                 }
 
@@ -269,10 +277,24 @@ namespace WeatherService.Scheduled
                     avgCddsForEachReadingInYear[i] = hcddMatrix[i][1];
                 }
 
+                double[][] hcddMatrixNonDailyHeatingOnly = new double[readingsCount][];
+                double[][] hcddMatrixNonDailyCoolingOnly = new double[readingsCount][];
+
+                for (int i = 0; i < readingsCount; i++)
+                {
+                    hcddMatrixNonDailyHeatingOnly[i] = new double[] { hcddMatrixNonDaily[i][0], hcddMatrixNonDaily[i][1] };
+                    hcddMatrixNonDailyCoolingOnly[i] = new double[] { hcddMatrixNonDaily[i][0], hcddMatrixNonDaily[i][2] };
+                }
+
                 double[] modelParams = new double[3];
                 modelParams[0] = 0;
                 modelParams[1] = 0;
                 modelParams[2] = 0;
+
+                //double[] modelParams = new double[];
+                //modelParams[0] = 0;
+                //modelParams[1] = 0;
+                //modelParams[2] = 0;
 
                 if (_pointPair.HeatingBalancePoint == 0 && _pointPair.CoolingBalancePoint == 0)
                 {
@@ -282,35 +304,78 @@ namespace WeatherService.Scheduled
                     {
                         onesVector[i] = 1;
                     }
+
                     modelParams[0] = Fit.LineThroughOrigin(onesVector, fullYDataDailyAvg);
 
-                    OrdinaryLeastSquares ols = new OrdinaryLeastSquares();
+                    //modelParams[0] = Fit.LineThroughOrigin(hcddMatrixNonDaily.Select(x => x[0]).ToArray(), fullYData);
 
-                    SimpleLinearRegression regression = ols.Learn(onesVector, fullYDataDailyAvg);
+                    OrdinaryLeastSquares ols = new OrdinaryLeastSquares()
+                    {
+                        UseIntercept = false
+                    };
 
-                    double[] predicted = regression.Transform(onesVector);
+                    SimpleLinearRegression regressionAccord = ols.Learn(hcddMatrixNonDaily.Select(x => x[0]).ToArray(), fullYData);
 
+                    double[] predictedAccord = regressionAccord.Transform(hcddMatrixNonDaily.Select(x => x[0]).ToArray());
 
-                    double errorNN = new SquareLoss(fullYDataDailyAvg).Loss(predicted);
+                    double errorAccord = new SquareLoss(fullYDataDailyAvg).Loss(predictedAccord);
 
-                    double rNN = regression.CoefficientOfDetermination(onesVector, fullYDataDailyAvg, adjust: false);
-                    double rNNAdj = regression.CoefficientOfDetermination(onesVector, fullYDataDailyAvg, adjust: true);
+                    double rAccord = regressionAccord.CoefficientOfDetermination(hcddMatrixNonDaily.Select(x => x[0]).ToArray(), fullYData, adjust: false);
+                    double rAdjAccord = regressionAccord.CoefficientOfDetermination(hcddMatrixNonDaily.Select(x => x[0]).ToArray(), fullYData, adjust: true);
 
                     AccordResult accordResult = new AccordResult()
                     {
-                        SimpleLinearRegression = regression,
-                        R2Accord = rNN,
-                        AdjustedR2Accord = rNNAdj,
+                        SimpleLinearRegression = regressionAccord,
+                        R2Accord = rAccord,
+                        AdjustedR2Accord = rAdjAccord,
                         IsSimpleSingleRegression = true,
                         HeatingBP = _pointPair.HeatingBalancePoint,
-                        CoolingBP = _pointPair.CoolingBalancePoint
+                        CoolingBP = _pointPair.CoolingBalancePoint,
+                        AccID = normalParamsKey.AccID,
+                        UtilID = normalParamsKey.UtilID,
+                        UnitID = normalParamsKey.UnitID
                     };
+
+                    //OrdinaryLeastSquares ols = new OrdinaryLeastSquares()
+                    //{
+                    //    UseIntercept = false
+                    //};
+
+                    //SimpleLinearRegression regressionAccord = ols.Learn(hcddMatrixNonDaily.Select(x => x[0]).ToArray(), fullYData);
+
+                    //double[] predictedAccord = regressionAccord.Transform(hcddMatrixNonDaily.Select(x => x[0]).ToArray());
+
+                    //double errorAccord = new SquareLoss(fullYDataDailyAvg).Loss(predictedAccord);
+
+                    //double rAccord = regressionAccord.CoefficientOfDetermination(hcddMatrixNonDaily.Select(x => x[0]).ToArray(), fullYData, adjust: false);
+                    //double rAdjAccord = regressionAccord.CoefficientOfDetermination(hcddMatrixNonDaily.Select(x => x[0]).ToArray(), fullYData, adjust: true);
+
+                    //AccordResult accordResult = new AccordResult()
+                    //{
+                    //    SimpleLinearRegression = regressionAccord,
+                    //    R2Accord = rAccord,
+                    //    AdjustedR2Accord = rAdjAccord,
+                    //    IsSimpleSingleRegression = true,
+                    //    HeatingBP = _pointPair.HeatingBalancePoint,
+                    //    CoolingBP = _pointPair.CoolingBalancePoint,
+                    //    AccID = normalParamsKey.AccID,
+                    //    UtilID = normalParamsKey.UtilID,
+                    //    UnitID = normalParamsKey.UnitID
+                    //};
 
                     accordResults.Add(accordResult);
                 }
                 else if (_pointPair.CoolingBalancePoint != 0 && _pointPair.HeatingBalancePoint != 0)
                 {
                     modelParams = MultipleRegression.QR(hcddMatrix, fullYDataDailyAvg, intercept: true);
+
+                    double rAvg = MathNet.Numerics.GoodnessOfFit.CoefficientOfDetermination(
+                        hcddMatrix.Select((x) => modelParams[0] + modelParams[1] * x[0] + modelParams[2] * x[1]), fullYDataDailyAvg);
+
+                    //modelParams = MultipleRegression.QR(hcddMatrixNonDaily, fullYData, intercept: false);
+
+                    //double r = GoodnessOfFit.CoefficientOfDetermination(
+                    //    hcddMatrixNonDaily.Select(x => x[0] * modelParams[0] + x[1] * modelParams[1] + x[2] * modelParams[2]), fullYData);
 
                     //Accord
                     var ols = new OrdinaryLeastSquares()
@@ -326,9 +391,9 @@ namespace WeatherService.Scheduled
 
                         double error = new SquareLoss(expected: fullYDataDailyAvg).Loss(actual: predicted);
 
-                        double r2Accord = new RSquaredLoss(numberOfInputs: 2, expected: fullYDataDailyAvg).Loss(predicted);
+                        double r2Accord = new RSquaredLoss(numberOfInputs: 3, expected: fullYDataDailyAvg).Loss(predicted);
 
-                        var r2Loss = new RSquaredLoss(numberOfInputs: 2, expected: fullYDataDailyAvg) { Adjust = true };
+                        var r2Loss = new RSquaredLoss(numberOfInputs: 3, expected: fullYDataDailyAvg) { Adjust = true };
 
                         double adjustedR2Accord = r2Loss.Loss(predicted);
 
@@ -346,21 +411,71 @@ namespace WeatherService.Scheduled
                             R2CoffAdj = r2CoeffAdj,
                             HeatingBP = _pointPair.HeatingBalancePoint,
                             CoolingBP = _pointPair.CoolingBalancePoint,
-                            IsSimpleSingleRegression = false
+                            IsSimpleSingleRegression = false,
+                            AccID = normalParamsKey.AccID,
+                            UtilID = normalParamsKey.UtilID,
+                            UnitID = normalParamsKey.UnitID
                         };
 
                         accordResults.Add(accordResult);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.Message + " " + e.StackTrace);
                     }
+
+                    ////Accord
+                    //var ols = new OrdinaryLeastSquares()
+                    //{
+                    //    UseIntercept = false
+                    //};
+
+                    //try
+                    //{
+                    //    MultipleLinearRegression accordRegression = ols.Learn(hcddMatrixNonDaily, fullYData);
+
+                    //    double[] predicted = accordRegression.Transform(hcddMatrixNonDaily);
+
+                    //    double error = new SquareLoss(expected: fullYData).Loss(actual: predicted);
+
+                    //    double r2Accord = new RSquaredLoss(numberOfInputs: 3, expected: fullYData).Loss(predicted);
+
+                    //    var r2Loss = new RSquaredLoss(numberOfInputs: 3, expected: fullYData) { Adjust = true };
+
+                    //    double adjustedR2Accord = r2Loss.Loss(predicted);
+
+                    //    double r2Coeff = accordRegression.CoefficientOfDetermination(hcddMatrixNonDaily, fullYData, adjust: false);
+
+                    //    double r2CoeffAdj = accordRegression.CoefficientOfDetermination(hcddMatrixNonDaily, fullYData, adjust: true);
+
+                    //    AccordResult accordResult = new AccordResult()
+                    //    {
+                    //        MultipleRegression = accordRegression,
+                    //        Error = error,
+                    //        R2Accord = r2Accord,
+                    //        AdjustedR2Accord = adjustedR2Accord,
+                    //        R2Coeff = r2Coeff,
+                    //        R2CoffAdj = r2CoeffAdj,
+                    //        HeatingBP = _pointPair.HeatingBalancePoint,
+                    //        CoolingBP = _pointPair.CoolingBalancePoint,
+                    //        IsSimpleSingleRegression = false,
+                    //        AccID = normalParamsKey.AccID,
+                    //        UtilID = normalParamsKey.UtilID,
+                    //        UnitID = normalParamsKey.UnitID
+                    //    };
+
+                    //    accordResults.Add(accordResult);
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine(e.Message + " " + e.StackTrace);
+                    //}
 
                     try
                     {
-                        double[] pSvd = MultipleRegression.Svd(hcddMatrix, fullYDataDailyAvg, intercept: true);
-                        double rSvd = EvaluateParametizedModel(IdenticalBalancePointPairsForAllReadings, pSvd, fullYData).Item1;
-                        rSvds.Add((pSvd, rSvd));
+                        //double[] pSvd = MultipleRegression.Svd(hcddMatrix, fullYDataDailyAvg, intercept: true);
+                        //double rSvd = EvaluateParametizedModel(IdenticalBalancePointPairsForAllReadings, pSvd, fullYData).Item1;
+                        //rSvds.Add((pSvd, rSvd));
                     }
                     catch (Exception e)
                     {
@@ -373,29 +488,80 @@ namespace WeatherService.Scheduled
                     modelParams[0] = heatingTuple.Item1;
                     modelParams[1] = heatingTuple.Item2;
 
-                    OrdinaryLeastSquares ols = new OrdinaryLeastSquares();
+                    double r = MathNet.Numerics.GoodnessOfFit.CoefficientOfDetermination(
+                        avgHddsForEachReadingInYear.Select(x => heatingTuple.Item1 + heatingTuple.Item2 * x), fullYDataDailyAvg);
 
-                    SimpleLinearRegression regression = ols.Learn(avgHddsForEachReadingInYear, fullYDataDailyAvg);
+                    OrdinaryLeastSquares ols = new OrdinaryLeastSquares()
+                    {
+                        UseIntercept = true
+                    };
 
-                    double[] predicted = regression.Transform(avgHddsForEachReadingInYear);
+                    SimpleLinearRegression regressionAccord = ols.Learn(avgHddsForEachReadingInYear, fullYDataDailyAvg);
 
+                    double[] predictedAccord = regressionAccord.Transform(avgHddsForEachReadingInYear);
 
-                    double errorNN = new SquareLoss(fullYDataDailyAvg).Loss(predicted);
+                    double errorAccord = new SquareLoss(fullYDataDailyAvg).Loss(predictedAccord);
 
-                    double rNN = regression.CoefficientOfDetermination(avgHddsForEachReadingInYear, fullYDataDailyAvg, adjust: false);
-                    double rNNAdj = regression.CoefficientOfDetermination(avgHddsForEachReadingInYear, fullYDataDailyAvg, adjust: true);
+                    double rAccord = regressionAccord.CoefficientOfDetermination(avgHddsForEachReadingInYear, fullYDataDailyAvg, adjust: false);
+                    double rAdjAccord = regressionAccord.CoefficientOfDetermination(avgHddsForEachReadingInYear, fullYDataDailyAvg, adjust: true);
 
                     AccordResult accordResult = new AccordResult()
                     {
-                        SimpleLinearRegression = regression,
-                        R2Accord = rNN,
-                        AdjustedR2Accord = rNNAdj,
+                        SimpleLinearRegression = regressionAccord,
+                        R2Accord = rAccord,
+                        AdjustedR2Accord = rAdjAccord,
                         IsSimpleSingleRegression = true,
                         HeatingBP = _pointPair.HeatingBalancePoint,
                         CoolingBP = _pointPair.CoolingBalancePoint
                     };
 
                     accordResults.Add(accordResult);
+
+                    //OrdinaryLeastSquares ols = new OrdinaryLeastSquares()
+                    //{
+                    //    UseIntercept = false
+                    //};
+
+                    //try
+                    //{
+                    //    MultipleLinearRegression accordRegression = ols.Learn(hcddMatrixNonDailyHeatingOnly, fullYData);
+
+                    //    double[] predicted = accordRegression.Transform(hcddMatrixNonDailyHeatingOnly);
+
+                    //    double error = new SquareLoss(expected: fullYData).Loss(actual: predicted);
+
+                    //    double r2Accord = new RSquaredLoss(numberOfInputs: 3, expected: fullYData).Loss(predicted);
+
+                    //    var r2Loss = new RSquaredLoss(numberOfInputs: 3, expected: fullYData) { Adjust = true };
+
+                    //    double adjustedR2Accord = r2Loss.Loss(predicted);
+
+                    //    double r2Coeff = accordRegression.CoefficientOfDetermination(hcddMatrixNonDailyHeatingOnly, fullYData, adjust: false);
+
+                    //    double r2CoeffAdj = accordRegression.CoefficientOfDetermination(hcddMatrixNonDailyHeatingOnly, fullYData, adjust: true);
+
+                    //    AccordResult accordResult = new AccordResult()
+                    //    {
+                    //        MultipleRegression = accordRegression,
+                    //        Error = error,
+                    //        R2Accord = r2Accord,
+                    //        AdjustedR2Accord = adjustedR2Accord,
+                    //        R2Coeff = r2Coeff,
+                    //        R2CoffAdj = r2CoeffAdj,
+                    //        HeatingBP = _pointPair.HeatingBalancePoint,
+                    //        CoolingBP = _pointPair.CoolingBalancePoint,
+                    //        IsSimpleSingleRegression = false,
+                    //        AccID = normalParamsKey.AccID,
+                    //        UtilID = normalParamsKey.UtilID,
+                    //        UnitID = normalParamsKey.UnitID
+                    //    };
+
+                    //    accordResults.Add(accordResult);
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine(e.Message + " " + e.StackTrace);
+                    //}
                 }
                 else if (_pointPair.CoolingBalancePoint > 0)
                 {
@@ -403,30 +569,79 @@ namespace WeatherService.Scheduled
                     modelParams[0] = coolingTuple.Item1;
                     modelParams[2] = coolingTuple.Item2;
 
-                    OrdinaryLeastSquares ols = new OrdinaryLeastSquares();
+                    OrdinaryLeastSquares ols = new OrdinaryLeastSquares()
+                    {
+                        UseIntercept = true
+                    };
 
-                    SimpleLinearRegression regression = ols.Learn(avgCddsForEachReadingInYear, fullYDataDailyAvg);
+                    SimpleLinearRegression regressionAccord = ols.Learn(avgCddsForEachReadingInYear, fullYDataDailyAvg);
 
-                    double[] predicted = regression.Transform(avgCddsForEachReadingInYear);
+                    double[] predictedAccord = regressionAccord.Transform(avgCddsForEachReadingInYear);
 
+                    double errorAccord = new SquareLoss(fullYDataDailyAvg).Loss(predictedAccord);
 
-                    double errorNN = new SquareLoss(fullYDataDailyAvg).Loss(predicted);
-
-                    double rNN = regression.CoefficientOfDetermination(avgCddsForEachReadingInYear, fullYDataDailyAvg, adjust: false);
-                    double rNNAdj = regression.CoefficientOfDetermination(avgCddsForEachReadingInYear, fullYDataDailyAvg, adjust: true);
+                    double rAccord = regressionAccord.CoefficientOfDetermination(avgCddsForEachReadingInYear, fullYDataDailyAvg, adjust: false);
+                    double rAdjAccord = regressionAccord.CoefficientOfDetermination(avgCddsForEachReadingInYear, fullYDataDailyAvg, adjust: true);
 
                     AccordResult accordResult = new AccordResult()
                     {
-                        SimpleLinearRegression = regression,
-                        R2Accord = rNN,
-                        AdjustedR2Accord = rNNAdj,
+                        SimpleLinearRegression = regressionAccord,
+                        R2Accord = rAccord,
+                        AdjustedR2Accord = rAdjAccord,
                         IsSimpleSingleRegression = true,
                         HeatingBP = _pointPair.HeatingBalancePoint,
                         CoolingBP = _pointPair.CoolingBalancePoint
                     };
 
                     accordResults.Add(accordResult);
-                };
+                }
+
+                    //OrdinaryLeastSquares ols = new OrdinaryLeastSquares()
+                    //{
+                    //    UseIntercept = false
+                    //};
+
+                    //try
+                    //{ 
+                    //MultipleLinearRegression accordRegression = ols.Learn(hcddMatrixNonDailyCoolingOnly, fullYData);
+
+                    //double[] predicted = accordRegression.Transform(hcddMatrixNonDailyCoolingOnly);
+
+                    //double error = new SquareLoss(expected: fullYData).Loss(actual: predicted);
+
+                    //double r2Accord = new RSquaredLoss(numberOfInputs: 3, expected: fullYData).Loss(predicted);
+
+                    //var r2Loss = new RSquaredLoss(numberOfInputs: 3, expected: fullYData) { Adjust = true };
+
+                    //double adjustedR2Accord = r2Loss.Loss(predicted);
+
+                    //double r2Coeff = accordRegression.CoefficientOfDetermination(hcddMatrixNonDailyCoolingOnly, fullYData, adjust: false);
+
+                    //double r2CoeffAdj = accordRegression.CoefficientOfDetermination(hcddMatrixNonDailyCoolingOnly, fullYData, adjust: true);
+
+                    //AccordResult accordResult = new AccordResult()
+                    //{
+                    //    MultipleRegression = accordRegression,
+                    //    Error = error,
+                    //    R2Accord = r2Accord,
+                    //    AdjustedR2Accord = adjustedR2Accord,
+                    //    R2Coeff = r2Coeff,
+                    //    R2CoffAdj = r2CoeffAdj,
+                    //    HeatingBP = _pointPair.HeatingBalancePoint,
+                    //    CoolingBP = _pointPair.CoolingBalancePoint,
+                    //    IsSimpleSingleRegression = false,
+                    //    AccID = normalParamsKey.AccID,
+                    //    UtilID = normalParamsKey.UtilID,
+                    //    UnitID = normalParamsKey.UnitID
+                    //};
+
+                    //accordResults.Add(accordResult);
+                    //    }
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine(e.Message + " " + e.StackTrace);
+                    //}
+                //};
 
                 Tuple<double, double> regressionEval;
 
@@ -460,28 +675,24 @@ namespace WeatherService.Scheduled
             }
 
             //(double[], double) bigRSvd = rSvds.OrderByDescending(s => s.Item2).ToList().First();
-            AccordResult accord = accordResults.OrderByDescending(s => s.AdjustedR2Accord).ToList().First();
+            AccordResult accord = accordResults.OrderByDescending(s => s.R2Accord).ToList().First();
+            AccordResult accordAdj = accordResults.OrderByDescending(s => s.AdjustedR2Accord).ToList().First();
             BalancePointPair _winner = updatedBalancePointPairs.OrderByDescending(s => s.RSquared_New).ToList().First();
             double? _bigRNew_OG = _winner.RSquared_New;
 
-            PopulateMyWthExpUsage(accord);
-
-            //if(bigRNew_OG <= bigRPoly.Item2 || bigRNew_OG < bigRPower.Item2)
-            //{
-            //    Console.WriteLine("hey!");
-            //}
+            //PopulateMyWthExpUsage(accord);
 
             return updatedBalancePointPairs;
         }
 
         private Tuple<double, double> EvaluateParametizedModel(List<BalancePointPair> balancePointPairs, double[] modelParameters, double[] fullYData)
         {
-            List<double> fullXData_NewFit = new List<double>();
+            List<double> predicted = new List<double>();
 
             foreach (BalancePointPair balancePointPair in balancePointPairs)
             {
                 double expUsage_New = CalculateExpUsageForNomalizing(balancePointPair, modelParameters);
-                fullXData_NewFit.Add(expUsage_New);
+                predicted.Add(expUsage_New);
             }
 
             int degreesOfFreedom = 0;
@@ -499,9 +710,9 @@ namespace WeatherService.Scheduled
 
             try
             {
-                rBest = GoodnessOfFit.CoefficientOfDetermination(fullXData_NewFit.ToArray(), fullYData);
+                rBest = MathNet.Numerics.GoodnessOfFit.CoefficientOfDetermination(predicted.ToArray(), fullYData);
 
-                standardError = GoodnessOfFit.StandardError(fullXData_NewFit.ToArray(), fullYData, degreesOfFreedom);
+                standardError = MathNet.Numerics.GoodnessOfFit.StandardError(predicted.ToArray(), fullYData, degreesOfFreedom);
             }
             catch (Exception e)
             {
@@ -594,7 +805,7 @@ namespace WeatherService.Scheduled
         private void PopulateMyWthExpUsage(AccordResult accord)
         {
             //List<ReadingsQueryResult> allReadings = _weatherRepository.GetReadingsFromExpUsageOriginal();
-            List<ReadingsQueryResult> allReadings = _weatherRepository.GetReadingsFromExpUsageOriginalCorrected();
+            List<ReadingsQueryResult> allReadings = _weatherRepository.GetReadingsFromExpUsageOriginalCorrected(accord);
 
             var readingsByAccount = allReadings.GroupBy(r => new { r.AccID, r.UtilID, r.RUnitID });
 
@@ -644,9 +855,22 @@ namespace WeatherService.Scheduled
                         }
                         else
                         {
-                            B1 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Intercept), 12, MidpointRounding.AwayFromZero);
-                            B2 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[0]), 12, MidpointRounding.AwayFromZero);
-                            B4 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[1]), 12, MidpointRounding.AwayFromZero);
+                            if (reading.B3 > 0 && reading.B5 > 0)
+                            {
+                                B1 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[0]), 12, MidpointRounding.AwayFromZero);
+                                B2 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[1]), 12, MidpointRounding.AwayFromZero);
+                                B4 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[2]), 12, MidpointRounding.AwayFromZero);
+                            }
+                            else if (reading.B3 > 0)
+                            {
+                                B1 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[0]), 12, MidpointRounding.AwayFromZero);
+                                B2 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[1]), 12, MidpointRounding.AwayFromZero);
+                            }
+                            else if (reading.B5 > 0)
+                            {
+                                B1 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[0]), 12, MidpointRounding.AwayFromZero);
+                                B4 = decimal.Round(Convert.ToDecimal(accord.MultipleRegression.Weights[1]), 12, MidpointRounding.AwayFromZero);
+                            }
                         }
 
                         HeatingCoolingDegreeDays hcdd = HeatingCoolingDegreeDaysValueOf(reading, weatherDataList);

@@ -28,6 +28,7 @@ namespace WeatherService.Services
         bool InsertWthNormalParams(WthNormalParams normalParams);
         List<ReadingsQueryResult> GetReadingsFromExpUsageOriginal();
         List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected();
+        List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected(AccordResult accord);
         WthNormalParams GetParamsForReading(int AccID, int UtilID, int UnitID);
         bool InsertMyWthExpUsage(WthExpUsage wthExpUsage);
         bool InsertMyWthExpUsage(WthExpUsage wthExpUsage, bool accord);

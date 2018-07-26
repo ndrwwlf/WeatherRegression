@@ -343,7 +343,28 @@ namespace WeatherService.Db
 
         public List<ReadingsQueryResult> GetReadingsForRegressionYear(string DesiredStartDate, WthNormalParams normalParamsKey)
         {
-            string DateEnd = GetEndDateAfterFullYear(DesiredStartDate, normalParamsKey);
+            //string DateEnd = GetEndDateAfterFullYear(DesiredStartDate, normalParamsKey);
+
+            //string Sql = @"select r.RdngID, b.Zip, r.DateStart,  r.DateEnd, r.Days, r.Units, r.AccID, r.UnitID as rUnitID, 
+            //                      wnp.UnitID as wnpUnitID, wnp.B1, wnp.B2, wnp.B3, wnp.B4, wnp.B5, wnp.EndDate as EndDateOriginal
+            //            from Readings r 
+            //            join WthNormalParams wnp on wnp.AccID = r.AccID
+            //                                        and wnp.UtilID = r.UtilID
+            //                                        and wnp.UnitID = r.UnitID
+            //            join Accounts a on a.AccID = r.AccID
+            //                               and a.AccID = @AccID
+            //                               and r.UtilID = @UtilID
+            //                               and r.UnitID = @UnitID
+            //            join Buildings b on b.BldID = a.BldID
+            //            where  r.DateStart >= @DateStart
+            //               and r.DateEnd <= @DateEnd
+            //            order by DateStart asc";
+
+            //using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+            //{
+            //    return db.Query<ReadingsQueryResult>(Sql, 
+            //        new { normalParamsKey.AccID, normalParamsKey.UtilID, normalParamsKey.UnitID, DateStart = DesiredStartDate, DateEnd }).AsList();
+            //}
 
             string Sql = @"select r.RdngID, b.Zip, r.DateStart,  r.DateEnd, r.Days, r.Units, r.AccID, r.UnitID as rUnitID, 
                                   wnp.UnitID as wnpUnitID, wnp.B1, wnp.B2, wnp.B3, wnp.B4, wnp.B5, wnp.EndDate as EndDateOriginal
@@ -354,14 +375,15 @@ namespace WeatherService.Db
                         join Accounts a on a.AccID = r.AccID
                                            and a.AccID = @AccID
                                            and r.UtilID = @UtilID
+                                           and r.UnitID = @UnitID
                         join Buildings b on b.BldID = a.BldID
-                        where  r.DateStart >= @DateStart
-                           and r.DateEnd <= @DateEnd
+                        where  r.Yr = @Year
                         order by DateStart asc";
 
             using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
             {
-                return db.Query<ReadingsQueryResult>(Sql, new { normalParamsKey.AccID, normalParamsKey.UtilID, DateStart = DesiredStartDate, DateEnd }).AsList();
+                return db.Query<ReadingsQueryResult>(Sql,
+                    new { normalParamsKey.AccID, normalParamsKey.UtilID, normalParamsKey.UnitID, Year = DesiredStartDate }).AsList();
             }
         }
 
@@ -437,12 +459,13 @@ namespace WeatherService.Db
 
         public List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected()
         {
+            List<WthNormalParams> myParams = new List<WthNormalParams>();
             List<ReadingsQueryResult> allReadings = new List<ReadingsQueryResult>();
 
             string Sql = @"select wnp.AccID, wnp.UtilID, wnp.UnitID, weu.ExpUsage, weu.RdngID from WthNormalParams wnp join WthExpUsage weu on wnp.AccID = weu.AccID and 
-                            wnp.UtilID = weu.UtilID and wnp.UnitID = weu.UnitID where wnp.R2_New > 0.8;";
-
-            List<WthNormalParams> myParams = new List<WthNormalParams>();
+                            wnp.UtilID = weu.UtilID and wnp.UnitID = weu.UnitID
+where wnp.R2_New > 0.8";
+//where wnp.R2_New > 0.8;";
 
             using (IDbConnection db = new SqlConnection(_myConnectionString))
             {
@@ -459,25 +482,124 @@ namespace WeatherService.Db
                 {
                     ReadingsQueryResult reading = new ReadingsQueryResult();
 
-                    string Sql2 = @"select AccID, UtilID, UnitID as RUnitID, RdngID, Units, DateStart, DateEnd, Days from Readings 
+                    string Sql2 = @"select RdngID, AccID, UtilID, UnitID as RUnitID, ExpUsage, Units, DateStart, DateEnd, Days from Readings 
                                         where RdngID = @RdngID;";
-                    try
-                    {
-                        using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
-                        {
-                            reading = db.Query<ReadingsQueryResult>(Sql2, new { wnp.RdngID }).First();
-                        }
 
-                        reading.ExpUsage = wnp.ExpUsage;
-                        allReadings.Add(reading);
-                    }catch (Exception e)
+                    using (IDbConnection db = new SqlConnection(_myConnectionString))
                     {
-                        Console.WriteLine(e.Message + " " + wnp.RdngID);
+                        reading = db.Query<ReadingsQueryResult>(Sql2, new { wnp.RdngID }).First();
                     }
+
+                    allReadings.Add(reading);
+
+                    //string Sql2 = @"select AccID, UtilID, UnitID as RUnitID, RdngID, Units, DateStart, DateEnd, Days from Readings 
+                    //                    where RdngID = @RdngID;";
+                    //try
+                    //{
+                    //    using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+                    //    {
+                    //        reading = db.Query<ReadingsQueryResult>(Sql2, new { wnp.RdngID }).First();
+                    //    }
+
+                    //    reading.ExpUsage = wnp.ExpUsage;
+                    //    allReadings.Add(reading);
+                    //    try
+                    //    {
+                    //        InsertMyReadings(reading);
+                    //    }
+                    //    catch (Exception e) { Console.WriteLine(e.Message + " " + e.StackTrace); }
+
+                    //} catch (Exception e)
+                    //    {
+                    //        Console.WriteLine(e.Message + " " + wnp.RdngID);
+                    //    }
                 }
             }
 
             return allReadings;
+        }
+
+        public List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected(AccordResult accord)
+        {
+            List<WthNormalParams> myParams = new List<WthNormalParams>();
+            List<ReadingsQueryResult> allReadings = new List<ReadingsQueryResult>();
+
+            string Sql = @"select wnp.AccID, wnp.UtilID, wnp.UnitID, weu.ExpUsage, weu.RdngID from WthNormalParams wnp join WthExpUsage weu on wnp.AccID = weu.AccID and 
+                            wnp.UtilID = weu.UtilID and wnp.UnitID = weu.UnitID where wnp.R2_New > 0.8 and wnp.AccID = @AccID and wnp.UtilID = @UtilID and wnp.UnitID = @UnitID";
+            //where wnp.R2_New > 0.8;";
+
+            using (IDbConnection db = new SqlConnection(_myConnectionString))
+            {
+                myParams = db.Query<WthNormalParams>(Sql, new { accord.AccID, accord.UtilID, accord.UnitID }).AsList();
+            }
+
+            var myParamsGroups = myParams.GroupBy(p => new { p.AccID, p.UtilID, p.UnitID });
+
+            foreach (var group in myParamsGroups)
+            {
+                List<WthNormalParams> wthNormalParams = group.ToList();
+
+                foreach (WthNormalParams wnp in wthNormalParams)
+                {
+                    ReadingsQueryResult reading = new ReadingsQueryResult();
+
+                    string Sql2 = @"select RdngID, AccID, UtilID, UnitID as RUnitID, ExpUsage, Units, DateStart, DateEnd, Days from Readings 
+                                        where RdngID = @RdngID;";
+
+                    using (IDbConnection db = new SqlConnection(_myConnectionString))
+                    {
+                        reading = db.Query<ReadingsQueryResult>(Sql2, new { wnp.RdngID }).First();
+                    }
+
+                    allReadings.Add(reading);
+
+                    //string Sql2 = @"select AccID, UtilID, UnitID as RUnitID, RdngID, Units, DateStart, DateEnd, Days from Readings 
+                    //                    where RdngID = @RdngID;";
+                    //try
+                    //{
+                    //    using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+                    //    {
+                    //        reading = db.Query<ReadingsQueryResult>(Sql2, new { wnp.RdngID }).First();
+                    //    }
+
+                    //    reading.ExpUsage = wnp.ExpUsage;
+                    //    allReadings.Add(reading);
+                    //    try
+                    //    {
+                    //        InsertMyReadings(reading);
+                    //    }
+                    //    catch (Exception e) { Console.WriteLine(e.Message + " " + e.StackTrace); }
+
+                    //} catch (Exception e)
+                    //    {
+                    //        Console.WriteLine(e.Message + " " + wnp.RdngID);
+                    //    }
+                }
+            }
+
+            return allReadings;
+        }
+
+        private void InsertMyReadings(ReadingsQueryResult reading)
+        {
+            string Sql = @"Insert into Readings (RdngID, ExpUsage, AccID, UtilID, UnitID, Units, DateStart, DateEnd, Days) Values (@RdngID, @ExpUsage, @AccID, @UtilID, 
+                            @UnitID, @Units, @DateStart, @DateEnd, @Days)";
+
+            using (IDbConnection db = new SqlConnection(_myConnectionString))
+            {
+                int rowsAffected = db.Execute(Sql, new
+                {
+                    reading.RdngID,
+                    reading.ExpUsage,
+                    reading.AccID,
+                    reading.UtilID,
+                    UnitID = reading.RUnitID,
+                    reading.Units,
+                    reading.DateStart,
+                    reading.DateEnd,
+                    reading.Days
+                });
+            }
         }
 
         public WthNormalParams GetParamsForReading(int AccID, int UtilID, int UnitID)
@@ -496,8 +618,8 @@ namespace WeatherService.Db
             string sql = @"
             INSERT INTO [MyWthExpUsage] ([RdngID], [Units], [ExpUsage_New], [PercentDelta_New], [ExpUsage_Old], [PercentDelta_Old], [DateStart], [DateEnd],
             [AccID], [UtilID], [UnitID]) 
-            VALUES (@RdngID, @Units, @ExpUsage_New, @PercentDelta_New, @ExpUsage_Old, @PercentDelta_Old, @DateStart, @DateEnd, @AccID, @UtilID, @UnitID);
-            SELECT CAST(SCOPE_IDENTITY() as int)";
+            VALUES (@RdngID, @Units, @ExpUsage_New, @PercentDelta_New, @ExpUsage_Old, @PercentDelta_Old, @DateStart, @DateEnd, @AccID, @UtilID, @UnitID);";
+            //SELECT CAST(SCOPE_IDENTITY() as int)";
 
             //using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
             using (IDbConnection db = new SqlConnection(_myConnectionString))
