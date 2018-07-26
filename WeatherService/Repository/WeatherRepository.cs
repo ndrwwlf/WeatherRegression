@@ -387,26 +387,50 @@ namespace WeatherService.Db
             }
         }
 
-        public bool InsertWthNormalParams(WthNormalParams normalParams)
+        public bool InsertWthNormalParams(WthNormalParams normalParams, bool Accord)
         {
-            string sql = @"
-            INSERT INTO [WthNormalParams] ([AccID], [UtilID], [UnitID], [WthZipCode], 
-            [B1_New], [B1_Original],
-            [B2_New], [B2_Original],
-            [B3_New], [B3_Original],
-            [B4_New], [B4_Original],
-            [B5_New], [B5_Original],
-            [R2_New], [R2_Original], 
-            [StandardError_New], [YearOfReadsDateStart], [YearOfReadsDateEnd], [EndDate_Original], [Readings], [Days]) 
-            VALUES (@AccID, @UtilID, @UnitID, @WthZipCode, 
-            @B1_New, @B1_Original,
-            @B2_New,  @B2_Original,
-            @B3_New, @B3_Original,
-            @B4_New,  @B4_Original,
-            @B5_New,  @B5_Original,
-            @R2_New, @R2_Original, 
-            @StandardError_New, @YearOfReadsDateStart, @YearOfReadsDateEnd, @EndDate_Original, @Readings, @Days)";
+            string sql = "";
 
+            if (!Accord)
+            {
+                sql = @"
+                INSERT INTO [WthNormalParams] ([AccID], [UtilID], [UnitID], [WthZipCode], 
+                [B1_New], [B1_Original],
+                [B2_New], [B2_Original],
+                [B3_New], [B3_Original],
+                [B4_New], [B4_Original],
+                [B5_New], [B5_Original],
+                [R2_New], [R2_Original], 
+                [YearOfReadsDateStart], [YearOfReadsDateEnd], [EndDate_Original], [Readings], [Days]) 
+                VALUES (@AccID, @UtilID, @UnitID, @WthZipCode, 
+                @B1_New, @B1_Original,
+                @B2_New,  @B2_Original,
+                @B3_New, @B3_Original,
+                @B4_New,  @B4_Original,
+                @B5_New,  @B5_Original,
+                @R2_New, @R2_Original, 
+                @YearOfReadsDateStart, @YearOfReadsDateEnd, @EndDate_Original, @Readings, @Days)";
+            }
+            else if (Accord)
+            { 
+                sql = @"
+                INSERT INTO [WthNormalParamsAccord] ([AccID], [UtilID], [UnitID], [WthZipCode], 
+                [B1_New], [B1_Original],
+                [B2_New], [B2_Original],
+                [B3_New], [B3_Original],
+                [B4_New], [B4_Original],
+                [B5_New], [B5_Original],
+                [R2_New], [R2_Original], 
+                [YearOfReadsDateStart], [YearOfReadsDateEnd], [EndDate_Original], [Readings], [Days]) 
+                VALUES (@AccID, @UtilID, @UnitID, @WthZipCode, 
+                @B1_New, @B1_Original,
+                @B2_New,  @B2_Original,
+                @B3_New, @B3_Original,
+                @B4_New,  @B4_Original,
+                @B5_New,  @B5_Original,
+                @R2_New, @R2_Original,
+                @YearOfReadsDateStart, @YearOfReadsDateEnd, @EndDate_Original, @Readings, @Days)";
+            }
             //string sql = @"
             //INSERT INTO [WthNormalParams] ([AccID], [UtilID], [UnitID], [WthZipCode], 
             //[B1]
@@ -434,7 +458,6 @@ namespace WeatherService.Db
                     normalParams.B5_Original,
                     normalParams.R2_New,
                     normalParams.R2_Original,
-                    normalParams.StandardError_New,
                     normalParams.YearOfReadsDateStart,
                     normalParams.YearOfReadsDateEnd,
                     normalParams.EndDate_Original,

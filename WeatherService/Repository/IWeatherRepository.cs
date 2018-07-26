@@ -25,12 +25,12 @@ namespace WeatherService.Services
 
         List<WthNormalParams> GetNormalParamsKeysForRegression();
         List<ReadingsQueryResult> GetReadingsForRegressionYear(string DateTimeStart, WthNormalParams accountAndUtil);
-        bool InsertWthNormalParams(WthNormalParams normalParams);
+        bool InsertWthNormalParams(WthNormalParams normalParams, bool Accord);
         List<ReadingsQueryResult> GetReadingsFromExpUsageOriginal();
         List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected();
         List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected(AccordResult accord);
         WthNormalParams GetParamsForReading(int AccID, int UtilID, int UnitID);
         bool InsertMyWthExpUsage(WthExpUsage wthExpUsage);
-        bool InsertMyWthExpUsage(WthExpUsage wthExpUsage, bool accord);
+        bool InsertMyWthExpUsage(WthExpUsage wthExpUsage, bool Accord);
     }
 }

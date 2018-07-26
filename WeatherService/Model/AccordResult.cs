@@ -1,8 +1,11 @@
-﻿using Accord.Statistics.Models.Regression.Linear;
+﻿using Accord.Statistics.Analysis;
+using Accord.Statistics.Models.Regression.Linear;
+using Accord.Statistics.Testing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WeatherService.Dto;
 
 namespace WeatherService.Model
 {
@@ -22,5 +25,9 @@ namespace WeatherService.Model
         public int AccID { get; set; }
         public int UtilID { get; set; }
         public int UnitID { get; set; }
+        public MultipleLinearRegressionAnalysis MLRA { get; set; }
+        public TTest Test { get; set; }
+        public double Intercept { get; set; }
+        public BalancePointPair bpPair { get; set; }
     }
 }

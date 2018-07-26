@@ -330,7 +330,7 @@ namespace WeatherService.Scheduled
                     //    normalParamsKey.Readings = winner.ReadingsInNormalYear;
                     //    normalParamsKey.Days = winner.DaysInNormalYear;
                     //}
-                    _weatherRepository.InsertWthNormalParams(normalParamsKey);
+                    _weatherRepository.InsertWthNormalParams(normalParamsKey, Accord: false);
                 }
                 catch (Exception e)
                 {
