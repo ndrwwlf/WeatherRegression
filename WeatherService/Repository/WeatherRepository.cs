@@ -366,7 +366,7 @@ namespace WeatherService.Db
             //        new { normalParamsKey.AccID, normalParamsKey.UtilID, normalParamsKey.UnitID, DateStart = DesiredStartDate, DateEnd }).AsList();
             //}
 
-            string Sql = @"select r.RdngID, b.Zip, r.DateStart,  r.DateEnd, r.Days, r.Units, r.AccID, r.UnitID as rUnitID, 
+            string Sql = @"select r.RdngID, b.Zip, r.DateStart,  r.DateEnd, r.Days, r.Units, r.AccID, r.UtilID, r.UnitID as rUnitID, 
                                   wnp.UnitID as wnpUnitID, wnp.B1, wnp.B2, wnp.B3, wnp.B4, wnp.B5, wnp.EndDate as EndDateOriginal
                         from Readings r 
                         join WthNormalParams wnp on wnp.AccID = r.AccID
