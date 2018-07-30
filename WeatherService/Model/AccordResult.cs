@@ -17,7 +17,7 @@ namespace WeatherService.Model
         public bool IsSimpleSingleRegression { get; set; }
         public int CoolingBP { get; set; } 
         public int HeatingBP { get; set; }
-        public double SxyError { get; set; }
+        public double SsyError { get; set; }
         public double R2Accord {get; set;}
         public double AdjustedR2Accord { get; set; }
         public double R2Coeff { get; set; }

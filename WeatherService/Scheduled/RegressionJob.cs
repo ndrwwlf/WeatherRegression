@@ -19,6 +19,7 @@ using Accord.Statistics.Analysis;
 using Accord.Statistics.Testing;
 using Accord.Math;
 using Accord.Statistics;
+using Accord.Math.Decompositions;
 
 namespace WeatherService.Scheduled
 {
@@ -50,7 +51,6 @@ namespace WeatherService.Scheduled
                 try
                 {
                     WthNormalParams paramsForAccord = normalParamsKey;
-                    //string desiredStartDate = normalParamsKey.EndDate_Original.AddYears(-1).ToShortDateString();
                     int yearAsInt = normalParamsKey.EndDate_Original.Year - 2000;
                     string desiredStartDate = yearAsInt.ToString();
 
@@ -63,37 +63,42 @@ namespace WeatherService.Scheduled
 
                     var resultsTuple = CalculateLinearRegression(allBalancePointStatsFromYear, normalParamsKey);
 
-                    List<BalancePointPair> analyzedBalancePointData = resultsTuple.Item1
-                        //.Where(s => s.B1_New >= 0)
-                        .OrderByDescending(s => s.RSquared_New).ToList();
+                    //List<BalancePointPair> analyzedBalancePointData = resultsTuple.Item1
+                    //    //.Where(s => s.B1_New >= 0)
+                    //    .OrderByDescending(s => s.RSquared_New).ToList();
 
-                    BalancePointPair winner = analyzedBalancePointData.FirstOrDefault();
+                    //BalancePointPair winner = analyzedBalancePointData.FirstOrDefault();
 
-                    normalParamsKey.B1_New = winner.B1_New;
-                    normalParamsKey.B2_New = winner.B2_New;
-                    normalParamsKey.B3_New = winner.HeatingBalancePoint;
-                    normalParamsKey.B4_New = winner.B4_New;
-                    normalParamsKey.B5_New = winner.CoolingBalancePoint;
+                    //normalParamsKey.B1_New = winner.B1_New;
+                    //normalParamsKey.B2_New = winner.B2_New;
+                    //normalParamsKey.B3_New = winner.HeatingBalancePoint;
+                    //normalParamsKey.B4_New = winner.B4_New;
+                    //normalParamsKey.B5_New = winner.CoolingBalancePoint;
 
-                    if (winner.RSquared_New.HasValue)
-                    {
-                        normalParamsKey.R2_New = decimal.Round(Convert.ToDecimal(winner.RSquared_New), 9, MidpointRounding.AwayFromZero);
-                    }
+                    //if (winner.RSquared_New.HasValue)
+                    //{
+                    //    normalParamsKey.R2_New = decimal.Round(Convert.ToDecimal(winner.RSquared_New), 9, MidpointRounding.AwayFromZero);
+                    //}
 
-                    normalParamsKey.WthZipCode = winner.WthZipCode;
-                    normalParamsKey.YearOfReadsDateStart = winner.YearOfReadsDateStart;
-                    normalParamsKey.YearOfReadsDateEnd = winner.YearOfReadsDateEnd;
-                    normalParamsKey.Readings = winner.ReadingsInNormalYear;
-                    normalParamsKey.Days = winner.DaysInNormalYear;
+                    //normalParamsKey.WthZipCode = winner.WthZipCode;
+                    //normalParamsKey.YearOfReadsDateStart = winner.YearOfReadsDateStart;
+                    //normalParamsKey.YearOfReadsDateEnd = winner.YearOfReadsDateEnd;
+                    //normalParamsKey.Readings = winner.ReadingsInNormalYear;
+                    //normalParamsKey.Days = winner.DaysInNormalYear;
                     //normalParamsKey.StandardError_New = decimal.Round(Convert.ToDecimal(winner.StandardError), 9, MidpointRounding.AwayFromZero);
 
                      //_weatherRepository.InsertWthNormalParams(normalParamsKey, Accord: false);
 
                     List<AccordResult> accords = resultsTuple.Item2
-                        //.Where(s => s.Intercept >= 0)
+                        .Where(s => s.Intercept >= 0)
                         .OrderByDescending(s => s.R2Accord).ToList();
 
                     AccordResult bestAccord = accords.FirstOrDefault();
+
+                    if (bestAccord.MLRA.FTest.Significant == false)
+                    {
+                        Console.WriteLine("F Test failed...");
+                    }
 
                     paramsForAccord.B1_New = decimal.Round(Convert.ToDecimal(bestAccord.Intercept), 9, MidpointRounding.AwayFromZero);
                     paramsForAccord.B2_New = 0;
@@ -232,8 +237,8 @@ namespace WeatherService.Scheduled
                         DaysInReading = reading.Days,
                         CoolingBalancePoint = reading.B5,
                         HeatingBalancePoint = reading.B3,
-                        CoolingDegreeDays = (double)hcdd.CDD,
-                        HeatingDegreeDays = (double)hcdd.HDD,
+                        CoolingDegreeDays = hcdd.CDD,
+                        HeatingDegreeDays = hcdd.HDD,
                         ActualUsage = reading.Units,
                         YearOfReadsDateStart = _ReadDateStart,
                         YearOfReadsDateEnd = _ReadDateEnd,
@@ -398,7 +403,7 @@ namespace WeatherService.Scheduled
                     }
                     else if (_pointPair.CoolingBalancePoint != 0 && _pointPair.HeatingBalancePoint != 0)
                     {
-                        modelParams = MultipleRegression.QR(hcddMatrix, fullYDataDailyAvg, intercept: true);
+                        //modelParams = MultipleRegression.QR(hcddMatrix, fullYDataDailyAvg, intercept: true);
 
                         //Accord
                         var ols = new OrdinaryLeastSquares()
@@ -450,7 +455,7 @@ namespace WeatherService.Scheduled
                             AccordResult accordResult = new AccordResult()
                             {
                                 MultipleRegression = regressionAccord,
-                                SxyError = SxyError,
+                                SsyError = SxyError,
                                 R2Accord = r2Accord,
                                 AdjustedR2Accord = adjustedR2Accord,
                                 R2Coeff = r2Coeff,
@@ -472,7 +477,7 @@ namespace WeatherService.Scheduled
                             }
                             else
                             {
-                                rejectedAccords.Add(accordResult);
+                                //rejectedAccords.Add(accordResult);
                             }
                         }
                         catch (Exception e)
@@ -482,12 +487,12 @@ namespace WeatherService.Scheduled
                     }
                     else if (_pointPair.HeatingBalancePoint > 0)
                     {
-                        Tuple<double, double> heatingTuple = Fit.Line(avgHddsForEachReadingInYear, fullYDataDailyAvg);
-                        modelParams[0] = heatingTuple.Item1;
-                        modelParams[1] = heatingTuple.Item2;
+                        //    Tuple<double, double> heatingTuple = Fit.Line(avgHddsForEachReadingInYear, fullYDataDailyAvg);
+                        //    modelParams[0] = heatingTuple.Item1;
+                        //    modelParams[1] = heatingTuple.Item2;
 
-                        double r = MathNet.Numerics.GoodnessOfFit.CoefficientOfDetermination(
-                            avgHddsForEachReadingInYear.Select(x => heatingTuple.Item1 + heatingTuple.Item2 * x), fullYDataDailyAvg);
+                        //    double r = MathNet.Numerics.GoodnessOfFit.CoefficientOfDetermination(
+                        //        avgHddsForEachReadingInYear.Select(x => heatingTuple.Item1 + heatingTuple.Item2 * x), fullYDataDailyAvg);
 
                         OrdinaryLeastSquares ols = new OrdinaryLeastSquares()
                         {
@@ -500,19 +505,25 @@ namespace WeatherService.Scheduled
 
                         double rAccord = new RSquaredLoss(1, fullYDataDailyAvg).Loss(predictedAccord);
 
-                        //double rAccord = regressionAccord.CoefficientOfDetermination(avgHddsForEachReadingInYear, fullYDataDailyAvg, adjust: false);
+                        double rAccord2 = regressionAccord.CoefficientOfDetermination(avgHddsForEachReadingInYear, fullYDataDailyAvg, adjust: false);
                         //double rAdjAccord = regressionAccord.CoefficientOfDetermination(avgHddsForEachReadingInYear, fullYDataDailyAvg, adjust: true);
 
-                        double sxy = regressionAccord.GetStandardError(avgHddsForEachReadingInYear, fullYDataDailyAvg);
-                        double sxx = avgHddsForEachReadingInYear.Subtract(avgHddsForEachReadingInYear.Mean()).Pow(2).Sum();
+                        int degreesOfFreedom = _pointPair.ReadingsInNormalYear - 2;
+                        //double ssy = regressionAccord.GetStandardError(avgHddsForEachReadingInYear, fullYDataDailyAvg);
+                        double ssx = (avgHddsForEachReadingInYear.Subtract(avgHddsForEachReadingInYear.Mean())).Pow(2).Sum();
+
+                        double s = Math.Sqrt(((fullYDataDailyAvg.Subtract(predictedAccord).Pow(2)).Sum()) / degreesOfFreedom);
+                        double seSubB = s / (Math.Sqrt(ssx));
+                        double myT = seSubB / regressionAccord.Slope;
+
                         double hypothesizedValue = 0;
 
                         TTest test = new TTest(
-                            estimatedValue: regressionAccord.Slope, standardError: sxx, degreesOfFreedom: _pointPair.ReadingsInNormalYear - 2,
+                            estimatedValue: regressionAccord.Slope, standardError: seSubB, degreesOfFreedom: degreesOfFreedom,
                             hypothesizedValue: hypothesizedValue, alternate: OneSampleHypothesis.ValueIsDifferentFromHypothesis
                             );
                         //TTest test = new TTest(
-                        //    statistic: regressionAccord.Slope, degreesOfFreedom: _pointPair.ReadingsInNormalYear - 2, 
+                        //    statistic: regressionAccord.Slope, degreesOfFreedom: _pointPair.ReadingsInNormalYear - 2,
                         //    hypothesis: OneSampleHypothesis.ValueIsDifferentFromHypothesis
                         //    );
 
@@ -540,9 +551,9 @@ namespace WeatherService.Scheduled
                     }
                     else if (_pointPair.CoolingBalancePoint > 0)
                     {
-                        Tuple<double, double> coolingTuple = Fit.Line(avgCddsForEachReadingInYear, fullYDataDailyAvg);
-                        modelParams[0] = coolingTuple.Item1;
-                        modelParams[2] = coolingTuple.Item2;
+                        //Tuple<double, double> coolingTuple = Fit.Line(avgCddsForEachReadingInYear, fullYDataDailyAvg);
+                        //modelParams[0] = coolingTuple.Item1;
+                        //modelParams[2] = coolingTuple.Item2;
 
                         OrdinaryLeastSquares ols = new OrdinaryLeastSquares()
                         {
@@ -554,12 +565,19 @@ namespace WeatherService.Scheduled
                         double[] predictedAccord = regressionAccord.Transform(avgCddsForEachReadingInYear);
                         double rAccord = new RSquaredLoss(1, fullYDataDailyAvg).Loss(predictedAccord);
 
-                        double sxy = regressionAccord.GetStandardError(avgCddsForEachReadingInYear, fullYDataDailyAvg);
-                        double sxx = avgCddsForEachReadingInYear.Subtract(avgCddsForEachReadingInYear.Mean()).Pow(2).Sum();
+                        int degreesOfFreedom = _pointPair.ReadingsInNormalYear - 2;
+                        double ssy = regressionAccord.GetStandardError(avgCddsForEachReadingInYear, fullYDataDailyAvg);
+                        double ssx = avgCddsForEachReadingInYear.Subtract(avgCddsForEachReadingInYear.Mean()).Pow(2).Sum();
+
+                        double s = Math.Sqrt(((fullYDataDailyAvg.Subtract(predictedAccord).Pow(2)).Sum()) / degreesOfFreedom);
+                        double seSubB = s / (Math.Sqrt(ssx));
+
+                        double myT = seSubB / regressionAccord.Slope;
+
                         double hypothesizedValue = 0;
 
                         TTest test = new TTest(
-                            estimatedValue: regressionAccord.Slope, standardError: sxx, degreesOfFreedom: _pointPair.ReadingsInNormalYear - 2,
+                            estimatedValue: regressionAccord.Slope, standardError: seSubB, degreesOfFreedom: degreesOfFreedom,
                             hypothesizedValue: hypothesizedValue, alternate: OneSampleHypothesis.ValueIsDifferentFromHypothesis
                             );
                         //TTest test = new TTest(
@@ -576,7 +594,8 @@ namespace WeatherService.Scheduled
                             CoolingBP = _pointPair.CoolingBalancePoint,
                             Test = test,
                             Intercept = regressionAccord.Intercept,
-                            bpPair = _pointPair
+                            bpPair = _pointPair,
+                            SsyError = ssy
                         };
 
                         if (test.Significant)
@@ -590,39 +609,39 @@ namespace WeatherService.Scheduled
                     };
 
 
-                    Tuple<double, double> regressionEval;
+                    //Tuple<double, double> regressionEval;
 
-                    if (AreDoublesAllNotInfinityNorNaN(modelParams))
-                    {
-                        regressionEval = EvaluateParametizedModel(IdenticalBalancePointPairsForAllReadings, modelParams, fullYData);
-                        double RSquared = regressionEval.Item1;
-                        double standardError = regressionEval.Item2;
+                    //if (AreDoublesAllNotInfinityNorNaN(modelParams))
+                    //{
+                    //    regressionEval = EvaluateParametizedModel(IdenticalBalancePointPairsForAllReadings, modelParams, fullYData);
+                    //    double RSquared = regressionEval.Item1;
+                    //    double standardError = regressionEval.Item2;
 
-                        if (AreDoublesAllNotInfinityNorNaN(new double[] { RSquared }))
-                        {
-                            _pointPair.B1_New = decimal.Round(Convert.ToDecimal(modelParams[0]), 9, MidpointRounding.AwayFromZero);
-                            _pointPair.B2_New = decimal.Round(Convert.ToDecimal(modelParams[1]), 9, MidpointRounding.AwayFromZero);
-                            _pointPair.B4_New = decimal.Round(Convert.ToDecimal(modelParams[2]), 9, MidpointRounding.AwayFromZero);
-                            _pointPair.RSquared_New = RSquared;
-                            _pointPair.StandardError = standardError;
-                        }
-                        else
-                        {
-                            _pointPair.HeatingBalancePoint = 0;
-                            _pointPair.CoolingBalancePoint = 0;
-                        }
-                    }
-                    else
-                    {
-                        _pointPair.HeatingBalancePoint = 0;
-                        _pointPair.CoolingBalancePoint = 0;
-                    };
+                    //    if (AreDoublesAllNotInfinityNorNaN(new double[] { RSquared }))
+                    //    {
+                    //        _pointPair.B1_New = decimal.Round(Convert.ToDecimal(modelParams[0]), 9, MidpointRounding.AwayFromZero);
+                    //        _pointPair.B2_New = decimal.Round(Convert.ToDecimal(modelParams[1]), 9, MidpointRounding.AwayFromZero);
+                    //        _pointPair.B4_New = decimal.Round(Convert.ToDecimal(modelParams[2]), 9, MidpointRounding.AwayFromZero);
+                    //        _pointPair.RSquared_New = RSquared;
+                    //        _pointPair.StandardError = standardError;
+                    //    }
+                    //    else
+                    //    {
+                    //        _pointPair.HeatingBalancePoint = 0;
+                    //        _pointPair.CoolingBalancePoint = 0;
+                    //    }
+                    //}
+                    //else
+                    //{
+                    //    _pointPair.HeatingBalancePoint = 0;
+                    //    _pointPair.CoolingBalancePoint = 0;
+                    //};
 
-                    updatedBalancePointPairs.Add(_pointPair);
+                    //updatedBalancePointPairs.Add(_pointPair);
 
                     AccordResult accord = accordResults.OrderByDescending(s => s.R2Accord).ToList().FirstOrDefault();
-                    BalancePointPair _winner = updatedBalancePointPairs.OrderByDescending(s => s.RSquared_New).ToList().First();
-                    double? _bigRNew_OG = _winner.RSquared_New;
+                    //BalancePointPair _winner = updatedBalancePointPairs.OrderByDescending(s => s.RSquared_New).ToList().First();
+                    //double? _bigRNew_OG = _winner.RSquared_New;
 
                     //if (accord != null)
                     //{
@@ -649,13 +668,13 @@ namespace WeatherService.Scheduled
                 predicted.Add(expUsage_New);
             }
 
-            int degreesOfFreedom = 0;
+            int degreesOfFreedom = fullYData.Length;
 
             foreach (double p in modelParameters)
             {
                 if (p > 0 || p < 0)
                 {
-                    degreesOfFreedom++;
+                    degreesOfFreedom--;
                 }
             }
 
