@@ -22,9 +22,9 @@ namespace WeatherService.Dao
         public int B5_Original { get; set; }
         public int B5_New { get; set; }
         public decimal? R2_Original { get; set; }
-        public decimal? R2_New { get; set; }
-        public DateTime YearOfReadsDateStart { get; set; }
-        public DateTime YearOfReadsDateEnd { get; set; }
+        public decimal R2_New { get; set; }
+        public DateTime? YearOfReadsDateStart { get; set; }
+        public DateTime? YearOfReadsDateEnd { get; set; }
         public DateTime EndDate_Original {get; set;}
         public int Readings { get; set; }
         public int Days { get; set; }
@@ -32,5 +32,6 @@ namespace WeatherService.Dao
         public decimal StandardError_Original { get; set; }
         public int RdngID { get; set; }
         public decimal ExpUsage { get; set; }
+        public int FTestFailed { get; set; }
     }
 }

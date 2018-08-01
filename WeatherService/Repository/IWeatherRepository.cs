@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using WeatherService.Dao;
-using WeatherService.Db;
 using WeatherService.Dto;
 using WeatherService.Model;
 
@@ -26,11 +25,14 @@ namespace WeatherService.Services
         List<WthNormalParams> GetNormalParamsKeysForRegression();
         List<ReadingsQueryResult> GetReadingsForRegressionYear(string DateTimeStart, WthNormalParams accountAndUtil);
         bool InsertWthNormalParams(WthNormalParams normalParams, bool Accord);
+        bool InsertWthNormalParamsFinal(NormalParamsAccord nParamsAccord);
         List<ReadingsQueryResult> GetReadingsFromExpUsageOriginal();
         List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected();
         List<ReadingsQueryResult> GetReadingsFromExpUsageOriginalCorrected(AccordResult accord);
         WthNormalParams GetParamsForReading(int AccID, int UtilID, int UnitID);
         bool InsertMyWthExpUsage(WthExpUsage wthExpUsage);
         bool InsertMyWthExpUsage(WthExpUsage wthExpUsage, bool Accord);
+
+        List<WNRdngData> GetAllReadingsFromStoredProcedure();
     }
 }

@@ -293,6 +293,14 @@ namespace WeatherService.Db
             }
         }
 
+        public List<WNRdngData> GetAllReadingsFromStoredProcedure()
+        {
+            using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+            {
+                return db.Query<WNRdngData>("WNRdngData01", CommandType.StoredProcedure).AsList();
+            }
+        }
+
         private string GetEndDateAfterFullYear(string YearDateStart, WthNormalParams normalParamsKey)
         {
             var dateTimeStart = new DateTime();
@@ -420,7 +428,7 @@ namespace WeatherService.Db
                 [B3_New], [B3_Original],
                 [B4_New], [B4_Original],
                 [B5_New], [B5_Original],
-                [R2_New], [R2_Original], 
+                [R2_New], [R2_Original], [FTestFailed],
                 [YearOfReadsDateStart], [YearOfReadsDateEnd], [EndDate_Original], [Readings], [Days]) 
                 VALUES (@AccID, @UtilID, @UnitID, @WthZipCode, 
                 @B1_New, @B1_Original,
@@ -428,7 +436,7 @@ namespace WeatherService.Db
                 @B3_New, @B3_Original,
                 @B4_New,  @B4_Original,
                 @B5_New,  @B5_Original,
-                @R2_New, @R2_Original,
+                @R2_New, @R2_Original, @FTestFailed,
                 @YearOfReadsDateStart, @YearOfReadsDateEnd, @EndDate_Original, @Readings, @Days)";
             }
             //string sql = @"
@@ -458,11 +466,51 @@ namespace WeatherService.Db
                     normalParams.B5_Original,
                     normalParams.R2_New,
                     normalParams.R2_Original,
+                    normalParams.FTestFailed,
                     normalParams.YearOfReadsDateStart,
                     normalParams.YearOfReadsDateEnd,
                     normalParams.EndDate_Original,
                     normalParams.Readings,
                     normalParams.Days
+                });
+
+                return (rowsAffected == 1);
+            }
+        }
+
+        public bool InsertWthNormalParamsFinal(NormalParamsAccord nParamsAccord)
+        {
+            string sql = @"
+                INSERT INTO [WthNormalParams] (
+                [AccID], [UtilID], [UnitID], [WstID], [ZipW], 
+                [B1], [B2], [B3], [B4], [B5], [R2], 
+                [EndDate], [EMoID], [MoCt], [DaysInYear]
+                ) 
+                VALUES (
+                @AccID, @UtilID, @UnitID, @WstID, @ZipW,
+                @B1, @B2, @B3, @B4, @B5, @R2,
+                @EndDate, @EMoID, @MoCt, @DaysInYear
+                )";
+
+            using (IDbConnection db = new SqlConnection(_myConnectionString))
+            {
+                int rowsAffected = db.Execute(sql, new
+                {
+                    nParamsAccord.AccID,
+                    nParamsAccord.UtilID,
+                    nParamsAccord.UnitID,
+                    nParamsAccord.WstID,
+                    nParamsAccord.ZipW,
+                    nParamsAccord.B1,
+                    nParamsAccord.B2,
+                    nParamsAccord.B3,
+                    nParamsAccord.B4,
+                    nParamsAccord.B5,
+                    nParamsAccord.R2,
+                    nParamsAccord.EndDate,
+                    nParamsAccord.EMoID,
+                    nParamsAccord.MoCt,
+                    nParamsAccord.DaysInYear
                 });
 
                 return (rowsAffected == 1);

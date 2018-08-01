@@ -15,6 +15,7 @@ namespace WeatherService.Model
         public MultipleLinearRegression MultipleRegression { get; set; }
         public MultipleLinearRegression NNMultipleAccordRegression { get; set; }
         public bool IsSimpleSingleRegression { get; set; }
+        public bool IsMultipleLinearRegression { get; set; }
         public int CoolingBP { get; set; } 
         public int HeatingBP { get; set; }
         public double SsyError { get; set; }
@@ -26,7 +27,7 @@ namespace WeatherService.Model
         public int UtilID { get; set; }
         public int UnitID { get; set; }
         public MultipleLinearRegressionAnalysis MLRA { get; set; }
-        public TTest Test { get; set; }
+        public TTest TTest { get; set; }
         public double Intercept { get; set; }
         public BalancePointPair bpPair { get; set; }
     }
