@@ -11,9 +11,6 @@ namespace WeatherService.Services
         List<string> GetDistinctZipCodes();
         bool InsertWeatherData(WeatherData weatherData);
         bool GetWeatherDataExistForZipAndDate(string ZipCode, DateTime rDate);
-        IDictionary<string, IEnumerable<string>> GetAllWeatherData();
-        List<WeatherData> GetWeatherData(PageParams pageParams);
-        List<WeatherData> GetWeatherDataByZipCode(string ZipCode, PageParams pageParams);
         int GetWeatherDataRowCount();
         int GetWeatherDataRowCountByZip(string ZipCode);
         List<ReadingsQueryResult> GetReadings(string DateStart);

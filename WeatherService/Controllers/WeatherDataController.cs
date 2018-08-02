@@ -19,55 +19,55 @@ namespace WeatherService.Controllers
             _weatherRepository = weatherRepository;
         }
 
-        // GET: api/WeatherData
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(List<WeatherData>))]
-        public IActionResult Get([FromQuery]PageParams pageParams)
-        {
-            int total = _weatherRepository.GetWeatherDataRowCount();
-            List<WeatherData> data = _weatherRepository.GetWeatherData(pageParams);
+        //// GET: api/WeatherData
+        //[HttpGet]
+        //[ProducesResponseType(200, Type = typeof(List<WeatherData>))]
+        //public IActionResult Get([FromQuery]PageParams pageParams)
+        //{
+        //    int total = _weatherRepository.GetWeatherDataRowCount();
+        //    List<WeatherData> data = _weatherRepository.GetWeatherData(pageParams);
 
-            return Ok(new
-            {
-                Data = data,
-                Paging = new
-                {
-                    Total = total,
-                    Limit = pageParams.RowsPerPage,
-                    Offset = (pageParams.PageNumber - 1) * pageParams.RowsPerPage,
-                    Returned = data.Count,
-                    PageAt = pageParams.PageNumber
-                }
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        Data = data,
+        //        Paging = new
+        //        {
+        //            Total = total,
+        //            Limit = pageParams.RowsPerPage,
+        //            Offset = (pageParams.PageNumber - 1) * pageParams.RowsPerPage,
+        //            Returned = data.Count,
+        //            PageAt = pageParams.PageNumber
+        //        }
+        //    });
+        //}
 
-        // GET: api/WeatherData/KMSO/WeatherData?PageNumber=1&RowsPerPage=20
-        [HttpGet("{ZipCpde}")]
-        [ProducesResponseType(200, Type = typeof(List<WeatherData>))]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public IActionResult Get([FromRoute]string ZipCode, [FromQuery]PageParams pageParams)
-        {
-            int total = _weatherRepository.GetWeatherDataRowCountByZip(ZipCode);
+        //// GET: api/WeatherData/KMSO/WeatherData?PageNumber=1&RowsPerPage=20
+        //[HttpGet("{ZipCpde}")]
+        //[ProducesResponseType(200, Type = typeof(List<WeatherData>))]
+        //[ProducesResponseType(400)]
+        //[ProducesResponseType(404)]
+        //public IActionResult Get([FromRoute]string ZipCode, [FromQuery]PageParams pageParams)
+        //{
+        //    int total = _weatherRepository.GetWeatherDataRowCountByZip(ZipCode);
 
-            if (total < 1)
-            {
-                return NotFound(new { message = "Weather Station not found for ZipCode " + ZipCode });
-            }
-            List<WeatherData> data = _weatherRepository.GetWeatherDataByZipCode(ZipCode, pageParams);
+        //    if (total < 1)
+        //    {
+        //        return NotFound(new { message = "Weather Station not found for ZipCode " + ZipCode });
+        //    }
+        //    List<WeatherData> data = _weatherRepository.GetWeatherDataByZipCode(ZipCode, pageParams);
 
-            return Ok(new
-            {
-                Data = data,
-                Paging = new
-                {
-                    Total = total,
-                    Limit = pageParams.RowsPerPage,
-                    Offset = (pageParams.PageNumber - 1) * pageParams.RowsPerPage,
-                    Returned = data.Count,
-                    PageAt = pageParams.PageNumber
-                }
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        Data = data,
+        //        Paging = new
+        //        {
+        //            Total = total,
+        //            Limit = pageParams.RowsPerPage,
+        //            Offset = (pageParams.PageNumber - 1) * pageParams.RowsPerPage,
+        //            Returned = data.Count,
+        //            PageAt = pageParams.PageNumber
+        //        }
+        //    });
+        //}
     }
 }

@@ -1,13 +1,10 @@
 ﻿using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.LinearRegression;
 using Newtonsoft.Json;
 using Quartz;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -22,8 +19,9 @@ namespace WeatherService.Scheduled
 {
     public class AerisJob : IJob
     {
-        private  AerisJobParams _aerisJobParams;
-        private  IWeatherRepository _weatherRepository;
+        private SPRegressionJob _sPRegressionJob = new SPRegressionJob();
+        private AerisJobParams _aerisJobParams;
+        private IWeatherRepository _weatherRepository;
 
         private int expectedWthExpUsageInserts;
         private int actualWthExpUsageInserts;
@@ -37,7 +35,7 @@ namespace WeatherService.Scheduled
         private int expectedHistoricalWeatherDataInserts;
         private int actualHistoricalWeatherDataInserts;
 
-        readonly DateTime fromDateStart = new DateTime(2014, 11, 13);
+        readonly DateTime _fromDateStart = new DateTime(2015, 01, 01);
 
         public Task Execute(IJobExecutionContext context)
         {
@@ -46,7 +44,16 @@ namespace WeatherService.Scheduled
 
             //Log.Information("\nWeather job starting...\n");
 
+            //var clock = System.Diagnostics.Stopwatch.StartNew();
+
             //GatherWeatherData();
+            //clock.Stop();
+
+            //var t = clock.Elapsed;
+
+            //Log.Error(t.ToString());
+
+            _sPRegressionJob.Execute(context);
 
             //PopulateWthExpUsageTable();
 
@@ -137,7 +144,7 @@ namespace WeatherService.Scheduled
             // yyyy, mm, dd
             //DateTime fromDate = new DateTime(2015, 01, 01);
 
-            int days = (int)fromDateStart.Subtract(today).TotalDays;
+            int days = (int)_fromDateStart.Subtract(today).TotalDays;
 
             int zipCount = _weatherRepository.GetDistinctZipCodes().Count;
 
@@ -148,7 +155,7 @@ namespace WeatherService.Scheduled
             {
                 expectedHistoricalWeatherDataInserts = expectedTotalWeatherDataEntries - actualTotalWeatherDataEntries;
 
-                Log.Information($"Starting GatherHistoricalWeatherData(), from {fromDateStart} to yesterday. {days} days.");
+                Log.Information($"Starting GatherHistoricalWeatherData(), from {_fromDateStart} to yesterday. {days} days.");
 
                 for (int i = days; i <= -1; i++)
                 {
@@ -169,7 +176,7 @@ namespace WeatherService.Scheduled
         {
             Log.Information("Starting PopulateWthExpUsage()...");
 
-            string fromDateStartStr = $"{fromDateStart.Month}-{fromDateStart.Day}-{fromDateStart.Year}";
+            string fromDateStartStr = $"{_fromDateStart.Month}-{_fromDateStart.Day}-{_fromDateStart.Year}";
 
             try
             {

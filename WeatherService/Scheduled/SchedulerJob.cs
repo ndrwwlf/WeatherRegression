@@ -9,7 +9,6 @@ namespace WeatherService.Scheduled
 {
     public class SchedulerJob 
     {
-
         public static async Task RunAsync(AerisJobParams aerisJobParams)
         //public static async Task RunAsync()
         {
@@ -44,14 +43,14 @@ namespace WeatherService.Scheduled
                 //    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(0))
                 //    .Build();
 
-                ITrigger sPRegressionTrigger = TriggerBuilder.Create()
-                    .WithIdentity("SPRegressionTrigger")
-                    .StartAt(aerisJobFinished)
-                    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(0))
-                    .Build();
+                //ITrigger sPRegressionTrigger = TriggerBuilder.Create()
+                //    .WithIdentity("SPRegressionTrigger")
+                //    .StartAt(aerisJobFinished)
+                //    .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(0))
+                //    .Build();
 
-                //await scheduler.ScheduleJob(regressionJob, regressionTrigger);
-                await scheduler.ScheduleJob(sPRegressionJob, sPRegressionTrigger);
+                ////await scheduler.ScheduleJob(regressionJob, regressionTrigger);
+                //await scheduler.ScheduleJob(sPRegressionJob, sPRegressionTrigger);
             }
             catch (ArgumentException e)
             {

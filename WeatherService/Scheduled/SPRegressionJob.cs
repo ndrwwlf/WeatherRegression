@@ -15,6 +15,7 @@ using Accord.Statistics.Analysis;
 using Accord.Statistics.Testing;
 using Accord.Math;
 using Accord.Statistics;
+using Serilog;
 
 namespace WeatherService.Scheduled
 {
@@ -31,12 +32,13 @@ namespace WeatherService.Scheduled
             _weatherRepository = _weatherRepositoryValueOf(_aerisJobParams);
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
+
             PopulateWthNormalParams();
             watch.Stop();
 
-            var t = watch.Elapsed.Seconds;
+            var t = watch.Elapsed;
 
-            Console.WriteLine(t);
+            Log.Error(t.ToString());
 
             //PopulateMyWthExpUsage();
 
@@ -160,6 +162,12 @@ namespace WeatherService.Scheduled
                 };
 
                 List<WeatherData> weatherDataList = _weatherRepository.GetWeatherDataByZipStartAndEndDate(reading.Zip, reading.DateStart, reading.DateEnd);
+
+                if (weatherDataList.Count != daysInReading)
+                {
+                    Log.Error($"WeatherData.Count != daysInReading: " + weatherDataList.Count + " " 
+                        + daysInReading + " AccID: " + reading.AccID + " UtilID: " + reading.UtilID + " UnitID: " + reading.UnitID + " Zip: " + reading.Zip + " MoID: " + reading.MoID);
+                }
 
                 int rangeMin = 45;
                 int rangeMax = 75;

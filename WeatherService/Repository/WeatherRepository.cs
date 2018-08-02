@@ -47,7 +47,8 @@ namespace WeatherService.Db
             VALUES (@StationId, @ZipCode, @RDate, @HighTmp, @LowTmp, @AvgTmp, @DewPT);
             SELECT CAST(SCOPE_IDENTITY() as int)";
 
-            using (IDbConnection db = new SqlConnection(_myConnectionString))
+            using (IDbConnection db = new SqlConnection(_realJitWeatherConnection))
+            //using (IDbConnection db = new SqlConnection(_myConnectionString))
             {
                 int rowsAffected = db.Execute(sql, new
                 {
@@ -66,76 +67,13 @@ namespace WeatherService.Db
 
         public bool GetWeatherDataExistForZipAndDate(string zipCode, DateTime rDate)
         {
-            using (IDbConnection db = new SqlConnection(_myConnectionString))
+            using (IDbConnection db = new SqlConnection(_realJitWeatherConnection))
             {
                 DateTime date = Convert.ToDateTime(rDate.ToShortDateString());
                 bool exists = db.ExecuteScalar<bool>("SELECT COUNT(1) FROM WeatherData WHERE ZipCode=@ZipCode AND RDate=@RDate",
                     new { ZipCode = zipCode, RDate = date });
                 return exists;
             }
-        }
-
-        public IDictionary<string, IEnumerable<string>> GetAllWeatherData()
-        {
-            IEnumerable<WeatherData> data;
-
-            IDictionary<string, IEnumerable<string>> map = new Dictionary<string, IEnumerable<string>>();
-
-            using (IDbConnection db = new SqlConnection(_myConnectionString))
-            {
-                data = db.Query<WeatherData>("SELECT ZipCode, RDate FROM WeatherData");
-
-                foreach (WeatherData weatherData in data)
-                {
-                    if (map.ContainsKey(weatherData.ZipCode))
-                    {
-                        //IEnumerable<string> dates = map.GetValueOrDefault(weatherData.ZipCode);
-                        IEnumerable<string> dates = map[weatherData.ZipCode];
-                        dates.Append(weatherData.RDate.ToShortDateString());
-                        map[weatherData.ZipCode] = dates;
-                    }
-                    else
-                    {
-                        IEnumerable<string> dates = new List<string>();
-                        dates.Append(weatherData.RDate.ToShortDateString());
-                        map.Add(weatherData.ZipCode, dates);
-                    }
-                }
-                return map;
-            }
-        }
-
-        public List<WeatherData> GetWeatherData(PageParams pageParams)
-        { 
-            var data = new List<WeatherData>();
-
-            string Sql = @"SELECT ID, RTRIM(StationId) AS StationId, ZipCode, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData  
-                ORDER BY RDate DESC, StationId ASC 
-                OFFSET ((@PageNumber - 1) * @RowsPerPage) ROWS 
-                FETCH NEXT @RowsPerPage ROWS ONLY"; 
-
-            using (IDbConnection db = new SqlConnection(_myConnectionString)) 
-            { 
-               data = db.Query<WeatherData>(Sql, new { pageParams.PageNumber, pageParams.RowsPerPage}).AsList(); 
-               return data;
-            } 
-        } 
-
-        public List<WeatherData> GetWeatherDataByZipCode(string zipCode, PageParams pageParams)
-        { 
-            var data = new List<WeatherData>();
-
-            string Sql = @"SELECT ID, (RTRIM(StationId)) as StationId, ZipCode, RDate, HighTmp, LowTmp, AvgTmp, DewPt FROM WeatherData  
-                             WHERE ZipCode = @ZipCode  
-                             ORDER BY RDate DESC, StationId ASC  
-                             OFFSET ((@PageNumber - 1) * @RowsPerPage) ROWS  
-                             FETCH NEXT @RowsPerPage ROWS ONLY";
-
-            using (IDbConnection db = new SqlConnection(_realJitWeatherConnection))
-            {
-                data = db.Query<WeatherData>(Sql, new { zipCode, pageParams.PageNumber, pageParams.RowsPerPage }).AsList();
-                return data;
-            } 
         }
 
         public int GetWeatherDataRowCount()
@@ -227,8 +165,8 @@ namespace WeatherService.Db
         public int GetActualWthExpUsageRowCount()
         {
             string sql = @"SELECT COUNT(RdngID) FROM [WthExpUsage]";
-            using (IDbConnection db = new SqlConnection(_myConnectionString))
-            //using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
+            //using (IDbConnection db = new SqlConnection(_myConnectionString))
+            using (IDbConnection db = new SqlConnection(_jitWebData3ConnectionString))
 
             {
                 return db.ExecuteScalar<int>(sql);

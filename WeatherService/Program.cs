@@ -24,6 +24,7 @@ namespace WeatherService
             .MinimumLevel.Override("System", LogEventLevel.Information)
             .Enrich.FromLogContext()
             //to outsite of project
+            .WriteTo.File(userDir + "/Logs/ErrorLogJIT.txt", restrictedToMinimumLevel: LogEventLevel.Error, rollOnFileSizeLimit: true)
             .WriteTo.RollingFile(userDir + "/Logs/log-{Date}.txt", retainedFileCountLimit: null)
             .WriteTo.Console()
             .CreateLogger();
